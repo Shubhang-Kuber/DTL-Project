@@ -1,0 +1,11 @@
+
+1)Understand the student behaviors, academic challenges and emotional problems.
+
+2) Identify the effect of key factors like: stress, attendance shortage, financial burden, parental pressure, peer pressure etc.
+
+3)Allow the faculty and the counselors to gauge which student has a high probable chance to dropout.
+
+4)Categorise the students into: low, medium and high risk categories and provide substantial help to the needed.
+
+5) Produce a predictive ML Model that will estimate the dropout risk of the student with high accuracy
+

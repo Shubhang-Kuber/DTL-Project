@@ -1,0 +1,3 @@
+Many college students silently disengage and drop out due to a combination of academic disinterest, emotional fatigue, mental health struggles, and lack of early guidance.
+Faculty often detect these issues only after students have already decided to leave, primarily due to large class sizes and limited monitoring systems. There is a lack of an early predictive framework that integrates behavioural, emotional, and academic data to proactively identify at-risk students.
+Hence, this project aims to build a predictive model for student dropout risk, combining empathy-driven insights and machine learning to help colleges detect and support vulnerable students early.

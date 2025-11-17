@@ -1,0 +1,13 @@
+ Motivation Behind the Project (PPT Slide Content)
+
+As a student myself, I’ve witnessed many classmates struggle with academic pressure, peer comparison, and the overwhelming pace of engineering coursework.
+
+I’ve seen friends burn out, lose confidence, detach from classes, and even question their future because they felt isolated or “not good enough.”
+
+These experiences made me realize that dropout is not just an academic issue — it’s an emotional, psychological, social, and financial struggle.
+
+I wanted to explore Machine Learning techniques not just as a technical tool, but as a way to identify early signs of student distress and offer meaningful support.
+
+This project allows me to combine my interest in ML with a deeper, personal goal — helping my peers feel seen, understood, and supported before they reach a breaking point.
+
+The ultimate motivation is to build something that can create awareness, encourage early intervention, and contribute to a healthier, more supportive academic environment.

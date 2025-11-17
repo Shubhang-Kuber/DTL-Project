@@ -1,0 +1,97 @@
+⭐ Empathy Map for Student Dropout Prediction Project
+🗣 1. SAYS (What the student openly expresses)
+
+“I’m finding it hard to keep up with the subjects.”
+
+“The workload is too much.”
+
+“I don’t feel confident in class.”
+
+“I think I might fall behind compared to others.”
+
+“Sometimes I just feel like quitting.”
+
+“College doesn’t understand what we’re going through.”
+
+💭 2. THINKS (What the student privately thinks but doesn’t say)
+
+“I’m scared of failing and disappointing my family.”
+
+“Everyone else seems to be doing better than me.”
+
+“Maybe engineering was a wrong choice.”
+
+“I don’t feel good enough to continue.”
+
+“If I ask for help, people might judge me.”
+
+“This stress is affecting my health and sleep.”
+
+“What if I drop out? What will happen to my future?”
+
+🚶 3. DOES (Observable actions and behaviors)
+
+Avoids attending classes or arrives late frequently.
+
+Stops interacting in groups; prefers isolation.
+
+Submits assignments late or incomplete.
+
+Reduces participation in activities or events.
+
+Skips mentorship/counseling sessions.
+
+Avoids asking doubts in class.
+
+Spends more time overthinking than studying.
+
+❤️ 4. FEELS (Emotional state and struggles)
+
+Overwhelmed by academic workload.
+
+Stressed due to continuous peer comparison.
+
+Anxious about grades and future career.
+
+Lonely or socially isolated in college.
+
+Guilty for not meeting expectations.
+
+Confused about academic direction.
+
+Fearful of judgment from peers or teachers.
+
+Emotionally drained and mentally exhausted.
+
+⭐ BONUS SECTIONS (Optional but highly impressive in DTL):
+🎯 5. PAINS (Core challenges they face)
+
+Lack of confidence
+
+Financial pressure
+
+Poor academic performance
+
+Low attendance
+
+Family expectations
+
+Lack of proper guidance
+
+Fear of failure
+
+🌱 6. GAINS (What they hope for)
+
+Academic improvement
+
+Supportive mentors
+
+Emotional stability
+
+Better understanding of subjects
+
+Motivation and encouragement
+
+A clear sense of direction
+
+Feeling included and understood

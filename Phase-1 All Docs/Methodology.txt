@@ -1,0 +1,46 @@
+⭐ Methodology (5-Phase Workflow — PPT Ready)
+🔵 Phase 1: Empathy & Problem Understanding
+
+Collect insights from students, parents, and teachers.
+
+Identify emotional, academic, social, and financial factors influencing dropout.
+
+Understand real experiences, pain points, and behavioral patterns.
+
+🟢 Phase 2: Data Collection & Preprocessing
+
+Gather survey responses via Google Forms.
+
+Clean, filter, and convert responses into a structured CSV dataset.
+
+Encode categorical values, handle missing data, and normalize features.
+
+🟣 Phase 3: Exploratory Data Analysis (EDA)
+
+Compute correlations between inputs and dropout tendency.
+
+Identify strong predictors (stress, attendance, motivation, etc.).
+
+Visualize trends using heatmaps, boxplots, and distributions.
+
+🟠 Phase 4: ML Model Development & Risk Prediction
+
+Train multiple ML models (Logistic Regression, Random Forest, XGBoost).
+
+Evaluate using accuracy, precision, recall, F1-score, ROC-AUC.
+
+Predict dropout likelihood → Low / Medium / High risk categories.
+
+🟡 Phase 5: Application Prototype for Student Support
+
+Build a simple UI/application that:
+
+Takes student inputs
+
+Runs the model in the backend
+
+Shows risk level
+
+Suggests personalized guidance or support steps
+
+Helps students track academic and emotional well-being.
