@@ -258,12 +258,35 @@ Continued work will explore supervised learning experiments, multilingual sentim
 
 % References (use BibTeX/bibliography file or list manually)
 % =========================================================
-\bibliographystyle{IEEEtran}
-\bibliography{refs} % create refs.bib or replace with \begin{thebibliography}{1} ... \end{thebibliography}
+% =========================================================
+% References
+% =========================================================
+% =========================================================
+% References
+% =========================================================
+\begin{thebibliography}{9}
 
-% If you prefer to put references inline (small draft), uncomment the following:
-% \begin{thebibliography}{1}
-% \bibitem{ref1} A. Author, ``Title,'' \emph{Journal}, vol., no., pp., year.
-% \end{thebibliography}
+\bibitem{ref1} A. Author, ``Prediction of Student Dropout Analysis for Education using ML,'' \emph{IEEE}, 2024. [Online]. Available: \url{https://ieeexplore.ieee.org/document/10932448/}
+\par
+
+\bibitem{ref2} B. Author, ``Dropout Prediction for University Students Using ML,'' \emph{Applied Sciences}, vol. 13, no. 21, p. 12004, 2023. [Online]. Available: \url{https://www.mdpi.com/2076-3417/13/21/12004}
+\par
+\bibitem{ref3} C. Author, ``Early Dropout Prediction Model: University Leveling Course Case Study,'' \emph{Sustainability}, vol. 12, no. 22, p. 9314, 2023. [Online]. Available: \url{https://www.mdpi.com/2071-1050/12/22/9314}
+\par
+\bibitem{ref4} D. Author, ``Evaluating \& Forecasting Undergraduate Dropouts Using ML,'' \emph{Technologies}, vol. 13, no. 11, p. 480, 2023. [Online]. Available: \url{https://www.mdpi.com/2227-7080/13/11/480}
+\par
+\bibitem{ref5} E. Author, ``Survey of ML Approaches for Student Dropout Prediction,'' \emph{Data Science Journal}, 2022. [Online]. Available: \url{https://datascience.codata.org/articles/dsj-2019-014}
+\par
+\bibitem{ref6} F. Author, ``Predicting Student Dropout using ML \& DL: Systematic Review,'' 2023. [Online]. Available: \url{https://www.researchgate.net/publication/372493356}
+\par
+\bibitem{ref7} G. Author, ``Predicting Student Retention Using ML Techniques,'' \emph{ERIC}, 2021. [Online]. Available: \url{https://eric.ed.gov/?id=EJ1324765}
+\par
+\bibitem{ref8} H. Author, ``ML for Predicting Dropouts in Higher Education: Review,'' \emph{Education and Information Technologies}, 2020. [Online]. Available: \url{https://link.springer.com/article/10.1007/s10639-020-10306-9}
+\par
+\bibitem{ref9} I. Author, ``Predicting Student Dropout Using Educational Data Mining,'' \emph{ACM}, 2020. [Online]. Available: \url{https://dl.acm.org/doi/10.1145/3371158.3371180}
+
+\end{thebibliography}
+
+
 
 \end{document}
