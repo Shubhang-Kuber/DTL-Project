@@ -255,13 +255,7 @@ Future development will focus on implementing a simple, student-facing applicati
 Continued work will explore supervised learning experiments, multilingual sentiment analysis, and deployment strategies to ensure the model becomes scalable, interpretable, and usable in real educational environments.
 
 % =========================================================
-% Acknowledgment (optional)
-% =========================================================
-\section*{Acknowledgment}
-% Optional: include if you want to thank advisors or funding
-The authors would like to thank Pratik D Kulkarni , Tanay Vedantha R, Suhas Kamma\dots
 
-% =========================================================
 % References (use BibTeX/bibliography file or list manually)
 % =========================================================
 \bibliographystyle{IEEEtran}
