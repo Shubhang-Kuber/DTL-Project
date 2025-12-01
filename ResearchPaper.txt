@@ -117,7 +117,19 @@ The backend processing is carried out using Python-based statistical tools, whil
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.9\linewidth]{example-image}
+\includegraphics[width=0.9\linewidth]{Screenshot 2025-12-01 172942.png}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Screenshot 2025-12-01 172942.png}
+    \caption{Enter Caption}
+    \label{fig:placeholder}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{Screenshot 2025-12-01 172942.png}
+    \caption{Enter Caption}
+    \label{fig:placeholder}
+\end{figure}
 \caption{Block diagram of the proposed dropout-risk analysis system.}
 \label{fig:block}
 \end{figure}
