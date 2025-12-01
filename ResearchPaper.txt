@@ -1,0 +1,263 @@
+% =========================================================
+% IEEE Conference Style Template (Ready for Overleaf)
+% Sections included: Abstract, Introduction, Proposed Methodology, Implementation
+% Use: paste entire file into Overleaf (main .tex) and compile (pdfLaTeX)
+% =========================================================
+
+\documentclass[conference,10pt]{IEEEtran}
+\IEEEoverridecommandlockouts % if you need \thanks in conference mode
+
+% -- Fonts & basic packages (IEEE prefers Times / mathptmx)
+\usepackage{mathptmx}        % Times font (text + math)
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% -- Common packages
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{microtype}
+\usepackage{url}
+\usepackage{lipsum}          % for placeholder text (remove in your draft)
+\usepackage{xcolor}
+
+% -- Page and caption tweaks (optional, polite to IEEE style)
+\usepackage{caption}
+\captionsetup{font=footnotesize}
+
+% =========================================================
+% Document meta
+% =========================================================
+\title{Building a Predictive Model for Student Dropout Risk}
+
+\author{
+\IEEEauthorblockN{
+Shubhang Kuber\IEEEauthorrefmark{1},
+Pratik D. Kulkarni\IEEEauthorrefmark{2},
+Tanay Vedantha R\IEEEauthorrefmark{3},
+Suhas Kamma
+\IEEEauthorrefmark{4}
+}
+
+\IEEEauthorblockA{\IEEEauthorrefmark{1}Information Science and Engineering, R V College of Engineering , Bengaluru, India\\
+USN: 1RV24IS125}
+
+\IEEEauthorblockA{\IEEEauthorrefmark{2}Information Science and Engineering, R V College of Engineering , Bengaluru, India\\
+USN: 1RV24IS095}
+
+\IEEEauthorblockA{\IEEEauthorrefmark{3}Information Science and Engineering, R V College of Engineering , Bengaluru, India\\
+USN: 1RV24IS135}
+
+\IEEEauthorblockA{\IEEEauthorrefmark{4}Information Science and Engineering, R V College of Engineering , Bengaluru, India\\
+USN: 1RV24IS128}
+
+}
+
+
+% =========================================================
+\begin{document}
+\maketitle
+
+% --------------------------
+% Abstract (single paragraph)
+% --------------------------
+\section{Abstract}
+This phase of the study focuses on transforming raw student feedback data into meaningful analytical insights to support dropout-risk evaluation within the DTL (Design Thinking Lab) project.
+\par
+Using the collected Google Form responses as the primary dataset, two key methodological approaches were applied: Principal Component Analysis (PCA) and Full Factor Analysis.
+\par
+PCA was employed to reduce the original high-dimensional dataset (≈30 variables) into a smaller set of principal components while preserving the maximum possible variance. This dimensionality reduction enabled clearer interpretation of latent patterns and minimized multicollinearity among variables.
+\par
+Following PCA, Full Factor Analysis was conducted to uncover the underlying constructs influencing student behaviour, engagement, academic consistency, and emotional well-being—factors previously difficult to observe directly from individual survey items.
+\par
+The combined analytical pipeline produced a refined set of factors that contributed to the development of a preliminary dropout-risk classification model, categorizing students into low, medium, and high-risk groups based on their latent factor scores.
+\par
+The outcomes of Phase 2 provide a stronger methodological foundation for understanding student challenges and support the development of an early-warning, data-driven dropout prediction system for academic institutions.
+
+% (Optional) Keywords - remove if not required by your instructor
+\begin{IEEEkeywords}
+
+Index Terms—Dropout Prediction, Educational Data Mining, Principal Component Analysis (PCA), Factor Analysis, Dimensionality Reduction, Student Risk Classification, Machine Learning, Academic Performance Analytics.
+
+\end{IEEEkeywords}
+
+% =========================================================
+% 1. Introduction
+% =========================================================
+\section{Introduction}
+\label{sec:intro}
+
+% Start the introduction with broad context -> narrow to your contribution.
+% Keep paragraphs short and use citations where appropriate.
+% Example paragraph (replace with your own text):
+\par
+Across the world, education stands as one of the strongest forces for shaping human potential. Yet beneath the surface of every classroom lies a quiet challenge: students who slowly disengage, lose motivation, and eventually drop out. The reasons are rarely simple. They are woven from emotions, academic pressures, personal circumstances, and the environment they learn in. Understanding these hidden patterns is not only a scientific task — it is a moral one.
+
+\par
+In this project, we aim to bring clarity to this problem by using data as a lens to study student behaviour. By collecting responses through structured surveys and applying analytical methods such as Principal Component Analysis (PCA) and Full Factor Analysis, we attempt to uncover the deeper factors that shape a student’s learning journey. These methods allow us to reduce complexity, reveal meaningful relationships, and identify early signs of academic risk long before they turn into dropout decisions.
+
+\par
+Our work does not claim to solve dropout entirely, but it takes an important step: turning raw, scattered feedback into measurable insights that educators can act on. This project combines data science with empathy, showing how analytical tools can support students more effectively.
+
+\par
+This paper is organized as follows: Section~\ref{sec:method} outlines the methodology used for dimensionality reduction and factor discovery. Section~\ref{sec:impl} presents implementation details and initial results from the analysis. Finally, Section~\ref{sec:conclusion} summarizes the findings and highlights future directions for building a complete dropout-prediction system.
+
+% =========================================================
+% 2. Proposed Methodology
+% =========================================================
+\section{Proposed Methodology}
+\label{sec:method}
+
+\subsection{System Overview}
+The proposed framework is designed to identify potential student dropout risk using survey-based behavioural, academic, and emotional indicators. The system follows a structured analytical pipeline consisting of four stages: data collection, preprocessing, dimensionality reduction, and risk classification. 
+\par
+The backend processing is carried out using Python-based statistical tools, while the overall workflow integrates PCA and Full Factor Analysis to derive latent variables from the collected responses. Figure~\ref{fig:block} illustrates the conceptual architecture of the system.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.9\linewidth]{example-image}
+\caption{Block diagram of the proposed dropout-risk analysis system.}
+\label{fig:block}
+\end{figure}
+
+\subsection{Data Collection  Preprocessing}
+The dataset comprises responses collected through a structured Google Form survey, exported as a CSV file. Each item reflects student perceptions related to academics, motivation, mental state, and engagement. Preprocessing involves the following steps:
+\begin{itemize}
+\item Cleaning: Removal of incomplete entries, standardization of text fields, and coercion of all Likert-scale responses into numeric form.
+\item Encoding: Conversion of categorical information into numerical representations suitable for statistical modeling.
+\item Normalization: Scaling of all variables using z-score standardization to ensure uniform variance.
+\item Sampling Adequacy Tests: Kaiser–Meyer–Olkin (KMO) and Bartlett’s Test of Sphericity are performed to verify suitability for factor extraction.
+\end{itemize}
+
+\subsection{Feature Extraction and Factor Analysis}
+Dimensionality reduction is performed using Principal Component Analysis (PCA). The original high-dimensional space (approximately 30 variables) is reduced to a smaller set of principal components that capture the majority of dataset variance. 
+\par
+Components with eigenvalues greater than 1 are retained.
+Subsequently, Full Factor Analysis is applied to identify latent constructs that influence student behaviour. Varimax rotation is used to maximize interpretability of factor loadings. Factor scores are computed for each student and serve as the basis for risk interpretation and clustering.
+
+\subsection{Sentiment-Based Risk Modeling}
+A sentiment feature is generated by mapping each student’s qualitative expressions into a continuous scale ranging from $-1$ to $1$. This value reflects overall positivity or negativity in the student’s self-reported experience. Risk levels are defined using simple rule-based thresholds:
+\begin{itemize}
+\item Sentiment $< 0$ 
+→
+→ High Risk
+\item Sentiment $\approx 0$ 
+→
+→ Medium Risk
+\item Sentiment $> 0$ 
+→
+→ Low Risk
+\end{itemize}
+The sentiment-derived labels are combined with the extracted factor scores to produce a comprehensive risk profile. These merged features are then used for visualization and interpretation in the analysis stage.
+
+% =========================================================
+% 3. Implementation
+% =========================================================
+\section{Implementation}
+\label{sec:impl}
+
+\subsection{Software Environment}
+The analytical workflow for this study was carried out entirely in Google Colab using Python 3.x. The implementation relied on widely used open-source libraries for data analysis and statistical modelling. pandas and numpy were used for data loading and manipulation, while scikit-learn supported preprocessing, normalization, and Principal Component Analysis (PCA).
+\par
+The factor analyzer library was employed to run the Kaiser–Meyer–Olkin (KMO) test, Bartlett’s Test of Sphericity, factor extraction, and Varimax rotation. For sentiment scoring of free-text responses, the VADER tool from the nltk package was used. All visualizations—such as scree plots, loading charts, and scatter plots—were generated using matplotlib and seaborn. Colab’s built-in utilities were used to save figures and processed outputs in standard formats for inclusion in the research paper.
+
+\subsection{Processing Pipeline}
+The processing workflow followed a structured, reproducible sequence:
+
+\textbf{1. Dataset Loading:}
+The student response dataset (CSV file) obtained from Google Forms was imported as the primary input.
+
+\textbf{2. Initial Cleaning:}
+Text fields were trimmed, empty strings were treated as missing values, and incomplete rows were reviewed and removed only when necessary.
+
+\textbf{3. Likert-Scale Conversion:}
+Survey questions using a Likert scale were systematically converted into numeric values to enable statistical modelling.
+
+\textbf{4. Sanity Checks:}
+Variables were verified for correct data types, and columns with excessive missing values or near-zero variance were excluded to maintain data integrity.
+
+\textbf{5. KMO and Bartlett Tests:}
+These diagnostic tests were conducted to ensure that the dataset exhibited adequate correlations for PCA and factor analysis.
+
+\textbf{6. Standardization:}
+All numeric features were standardized using z-score normalization so each variable contributed proportionately during dimensionality reduction.
+
+\textbf{7. PCA (Dimensionality Reduction):}
+Principal Component Analysis was applied to identify components capturing maximum variance. The scree plot was used to select the optimal number of components.
+
+\textbf{8. Factor Analysis:}
+Full Factor Analysis was performed using the selected components, followed by Varimax rotation to enhance interpretability. Factor scores were computed for all students.
+
+\textbf{9. Sentiment Scoring:}
+Free-text responses were analyzed using VADER to generate sentiment values ranging from –1 (negative) to +1 (positive).
+
+\textbf{10. Feature Integration:}
+Sentiment scores were merged with the factor scores to form a unified feature dataset for risk evaluation.
+
+\textbf{11. Risk Classification:}
+Students were categorized into High, Medium, or Low Risk groups based on rule-based thresholds applied to the sentiment scores.
+
+\textbf{12. Visualization:}
+Multiple visual artifacts—such as scree plots, factor loading matrices, factor score scatter plots, and risk distribution charts—were produced to support interpretation and reporting.
+
+\subsection{Partial Results and Artifacts}
+Several intermediate outputs were produced to support interpretation:
+
+\textbf{1. KMO and Bartlett Results:}
+These diagnostic tests validated that the dataset exhibited sufficient inter-variable correlation and sampling adequacy, confirming its suitability for PCA and factor analysis.
+
+\textbf{2. Scree Plot:}
+A scree plot was generated to visualize the cumulative explained variance across components. This was used to justify the number of principal components retained for further analysis.
+
+\textbf{3. Factor Loading Table:}
+A structured table of rotated factor loadings identified the survey items that contributed strongly to each latent factor, enabling clear factor interpretation and naming.
+
+\textbf{4. Factor Score Scatter Plot:}
+A two-dimensional scatter plot of factor scores revealed clustering patterns and student group distributions across dominant latent dimensions.
+
+\textbf{5. Risk Distribution Summary:}
+A summary table provided the counts and percentages of students categorized into High, Medium, and Low Risk groups based on sentiment and factor-derived indicators.
+
+\textbf{6. Supporting Figures:}
+All visualizations—including scree plots, loading matrices, scatter plots, and distribution charts—were exported in high resolution to ensure consistency and clarity when included in the manuscript.
+
+\subsection{Notes on Evaluation and Reproducibility}
+To ensure consistent results, the entire pipeline followed reproducible practices such as setting fixed random seeds. 
+\par
+All preprocessing steps, factor models, and sentiment scores were generated through deterministic operations. The notebook environment was versioned, and outputs such as tables, figures, and factor matrices were saved systematically. This allows any researcher to replicate the results by running the same pipeline on the same dataset.
+
+% =========================================================
+% 4. Conclusion and Future Work (brief; can remain partial)
+% =========================================================
+\section{Conclusion and Future Work}
+\label{sec:concl}
+
+This study presented the second phase of a data-driven framework designed to identify potential student dropout risk using survey responses, dimensionality reduction, and sentiment-based analysis. Through systematic preprocessing, PCA, and Full Factor Analysis, the work demonstrated how complex behavioural and emotional indicators can be transformed into meaningful latent factors. These intermediate results provide a strong analytical foundation for building a comprehensive risk-prediction system and highlight the potential of combining statistical modelling with student-centric insights.
+
+Although the current phase successfully establishes the core analytical pipeline, several components remain to be completed. Full validation of the factor structure, integration of additional behavioural features, and comparison of supervised classification models are necessary to operationalize the system. Expanding the dataset size and conducting cross-validation will further strengthen the reliability of the results.
+
+Future development will focus on implementing a simple, student-facing application that leverages the backend model. This interface will allow students to input their data, receive an instant risk assessment, and view personalized guidance or support recommendations. Such a system can also help students track their academic and emotional well-being over time, making the model not only a diagnostic tool for institutions but also a practical self-reflection aid for learners.
+
+Continued work will explore supervised learning experiments, multilingual sentiment analysis, and deployment strategies to ensure the model becomes scalable, interpretable, and usable in real educational environments.
+
+% =========================================================
+% Acknowledgment (optional)
+% =========================================================
+\section*{Acknowledgment}
+% Optional: include if you want to thank advisors or funding
+The authors would like to thank Pratik D Kulkarni , Tanay Vedantha R, Suhas Kamma\dots
+
+% =========================================================
+% References (use BibTeX/bibliography file or list manually)
+% =========================================================
+\bibliographystyle{IEEEtran}
+\bibliography{refs} % create refs.bib or replace with \begin{thebibliography}{1} ... \end{thebibliography}
+
+% If you prefer to put references inline (small draft), uncomment the following:
+% \begin{thebibliography}{1}
+% \bibitem{ref1} A. Author, ``Title,'' \emph{Journal}, vol., no., pp., year.
+% \end{thebibliography}
+
+\end{document}
