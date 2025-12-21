@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dropout Risk Early-Warning System</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- SCREEN 1: Student Input Form -->
+        <div id="screen1" class="screen active">
+            <div class="screen-content">
+                <header class="header">
+                    <h1>Student Assessment Form</h1>
+                    <p>Help us understand your academic journey</p>
+                </header>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p class="progress-text"><span id="progressPercent">0</span>% Complete</p>
+
+                <form id="assessmentForm" class="form-container">
+                    <!-- Academic Performance Section -->
+                    <fieldset class="form-section">
+                        <legend>Academic Performance</legend>
+                        
+                        <div class="form-group">
+                            <label for="avgPerformance">Average Academic Performance (CGPA or %)</label>
+                            <input type="range" id="avgPerformance" name="avgPerformance" min="0" max="100" value="75" class="slider">
+                            <span class="value-display" id="avgPerformanceValue">75%</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="attendanceRate">Attendance Rate (%)</label>
+                            <input type="range" id="attendanceRate" name="attendanceRate" min="0" max="100" value="75" class="slider">
+                            <span class="value-display" id="attendanceRateValue">75%</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="courseInterest">Interest in the Course (1-5)</label>
+                            <div class="radio-group">
+                                <label class="radio"><input type="radio" name="courseInterest" value="1"> 1 - Very Low</label>
+                                <label class="radio"><input type="radio" name="courseInterest" value="2"> 2 - Low</label>
+                                <label class="radio"><input type="radio" name="courseInterest" value="3"> 3 - Neutral</label>
+                                <label class="radio"><input type="radio" name="courseInterest" value="4"> 4 - High</label>
+                                <label class="radio"><input type="radio" name="courseInterest" value="5"> 5 - Very High</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studyHours">Study Hours per Day</label>
+                            <select id="studyHours" name="studyHours" class="select-input">
+                                <option value="">Select...</option>
+                                <option value="1">&lt; 1 hour</option>
+                                <option value="2">1-2 hours</option>
+                                <option value="3">2-4 hours</option>
+                                <option value="4">&gt; 4 hours</option>
+                            </select>
+                        </div>
+                    </fieldset>
+
+                    <!-- Emotional & Social Section -->
+                    <fieldset class="form-section">
+                        <legend>Emotional Well-being & Support</legend>
+
+                        <div class="form-group">
+                            <label for="stressLevel">Stress or Anxiety Level (1-5)</label>
+                            <div class="radio-group">
+                                <label class="radio"><input type="radio" name="stressLevel" value="1"> 1 - Very Low</label>
+                                <label class="radio"><input type="radio" name="stressLevel" value="2"> 2 - Low</label>
+                                <label class="radio"><input type="radio" name="stressLevel" value="3"> 3 - Moderate</label>
+                                <label class="radio"><input type="radio" name="stressLevel" value="4"> 4 - High</label>
+                                <label class="radio"><input type="radio" name="stressLevel" value="5"> 5 - Very High</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="socialIsolation">Do you feel socially isolated or left out?</label>
+                            <select id="socialIsolation" name="socialIsolation" class="select-input">
+                                <option value="">Select...</option>
+                                <option value="1">Never</option>
+                                <option value="2">Rarely</option>
+                                <option value="3">Sometimes</option>
+                                <option value="4">Often</option>
+                                <option value="5">Always</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="helpSeeking">How often do you seek help from faculty or peers?</label>
+                            <select id="helpSeeking" name="helpSeeking" class="select-input">
+                                <option value="">Select...</option>
+                                <option value="1">Never</option>
+                                <option value="2">Rarely</option>
+                                <option value="3">Sometimes</option>
+                                <option value="4">Often</option>
+                                <option value="5">Always</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="familySupport">Family Support for Education (1-5)</label>
+                            <input type="range" id="familySupport" name="familySupport" min="1" max="5" value="3" class="slider">
+                            <span class="value-display" id="familySupportValue">3/5</span>
+                        </div>
+                    </fieldset>
+
+                    <!-- Engagement & Motivation Section -->
+                    <fieldset class="form-section">
+                        <legend>Engagement & Motivation</legend>
+
+                        <div class="form-group">
+                            <label for="motivation">Motivation to Continue Studies (1-5)</label>
+                            <input type="range" id="motivation" name="motivation" min="1" max="5" value="3" class="slider">
+                            <span class="value-display" id="motivationValue">3/5</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="extracurricular">Do you engage in extracurricular or sports activities?</label>
+                            <select id="extracurricular" name="extracurricular" class="select-input">
+                                <option value="">Select...</option>
+                                <option value="1">Never</option>
+                                <option value="2">Rarely</option>
+                                <option value="3">Occasionally</option>
+                                <option value="4">Regularly</option>
+                                <option value="5">Very Regularly</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="workCommitment">Do you have a part-time job or major commitments?</label>
+                            <select id="workCommitment" name="workCommitment" class="select-input">
+                                <option value="">Select...</option>
+                                <option value="1">No</option>
+                                <option value="2">Light commitments</option>
+                                <option value="3">Moderate commitments</option>
+                                <option value="4">Heavy commitments</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="overwhelm">How often do you feel overwhelmed by workload?</label>
+                            <select id="overwhelm" name="overwhelm" class="select-input">
+                                <option value="">Select...</option>
+                                <option value="1">Never</option>
+                                <option value="2">Rarely</option>
+                                <option value="3">Sometimes</option>
+                                <option value="4">Often</option>
+                                <option value="5">Always</option>
+                            </select>
+                        </div>
+                    </fieldset>
+
+                    <!-- External Factors Section -->
+                    <fieldset class="form-section">
+                        <legend>External Factors & Support</legend>
+
+                        <div class="form-group">
+                            <label for="financialProblems">Do financial problems affect your studies?</label>
+                            <select id="financialProblems" name="financialProblems" class="select-input">
+                                <option value="">Select...</option>
+                                <option value="5">No impact at all</option>
+                                <option value="4">Minimal impact</option>
+                                <option value="3">Moderate impact</option>
+                                <option value="2">Significant impact</option>
+                                <option value="1">Severe impact</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="healthIssues">Do you have health issues affecting studies?</label>
+                            <select id="healthIssues" name="healthIssues" class="select-input">
+                                <option value="">Select...</option>
+                                <option value="5">No issues</option>
+                                <option value="4">Minor issues</option>
+                                <option value="3">Moderate issues</option>
+                                <option value="2">Significant issues</option>
+                                <option value="1">Severe issues</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="institutionSupport">Satisfaction with College Support</label>
+                            <input type="range" id="institutionSupport" name="institutionSupport" min="1" max="5" value="3" class="slider">
+                            <span class="value-display" id="institutionSupportValue">3/5</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sentimentFeedback">Optional: Share your thoughts or concerns</label>
+                            <textarea id="sentimentFeedback" name="sentimentFeedback" class="textarea-input" placeholder="Your honest feedback helps us improve support..."></textarea>
+                        </div>
+                    </fieldset>
+
+                    <button type="submit" class="btn btn-primary btn-large">Analyze Risk</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: Risk Summary Output -->
+        <div id="screen2" class="screen">
+            <div class="screen-content">
+                <header class="header">
+                    <h1>Your Dropout Risk Assessment</h1>
+                </header>
+
+                <div class="risk-card" id="riskCard">
+                    <div class="risk-badge" id="riskBadge">
+                        <span id="riskLevel">Loading...</span>
+                    </div>
+                    <div class="risk-details">
+                        <p class="risk-explanation" id="riskExplanation">
+                            This risk level is based on academic, emotional, and engagement factors.
+                        </p>
+                        <div class="risk-metrics">
+                            <div class="metric">
+                                <span class="metric-label">Risk Score</span>
+                                <span class="metric-value" id="riskScore">-</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Confidence</span>
+                                <span class="metric-value" id="confidence">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="disclaimer">
+                    ⓘ This is an early-warning support tool, not a final decision system. It helps identify
+                    areas where additional support may be beneficial.
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="showScreen(3)">View Detailed Analysis</button>
+                    <button class="btn btn-secondary" onclick="showScreen(1)">Back to Form</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: Factor Breakdown Visualization -->
+        <div id="screen3" class="screen">
+            <div class="screen-content">
+                <header class="header">
+                    <h1>Factor Analysis Breakdown</h1>
+                    <p>Understanding the key drivers behind your risk level</p>
+                </header>
+
+                <div class="chart-container">
+                    <div class="chart-wrapper">
+                        <h3>Factor Scores</h3>
+                        <div class="tooltip-info">
+                            Each bar represents a key factor affecting your academic journey.
+                            Longer bars indicate stronger influence on your risk profile.
+                        </div>
+                        <canvas id="factorChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="factors-legend">
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #3498db;"></span>
+                        <div>
+                            <strong>Academic Support & Quality</strong>
+                            <p>Teaching quality, resources, and academic guidance</p>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #e74c3c;"></span>
+                        <div>
+                            <strong>Financial & Stress Management</strong>
+                            <p>Financial stability and anxiety levels</p>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #f39c12;"></span>
+                        <div>
+                            <strong>Institutional & Academic Environment</strong>
+                            <p>Course fit and institutional support</p>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #2ecc71;"></span>
+                        <div>
+                            <strong>Course Interest & Motivation</strong>
+                            <p>Personal drive and subject engagement</p>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #9b59b6;"></span>
+                        <div>
+                            <strong>Social Integration & Well-being</strong>
+                            <p>Peer connections and mental health</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="showScreen(4)">View Recommendations</button>
+                    <button class="btn btn-secondary" onclick="showScreen(2)">Back to Summary</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: Recommendations & Insights -->
+        <div id="screen4" class="screen">
+            <div class="screen-content">
+                <header class="header">
+                    <h1>Personalized Recommendations</h1>
+                    <p>Actions to support your academic success</p>
+                </header>
+
+                <div class="recommendations-container" id="recommendationsContainer">
+                    <!-- Recommendations will be populated here -->
+                </div>
+
+                <div class="disclaimer">
+                    ⓘ These recommendations are based on your assessment responses and academic profile.
+                    We encourage you to reach out to academic advisors, counseling services, or mentors
+                    to discuss personalized support strategies.
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="showScreen(3)">Back to Analysis</button>
+                    <button class="btn btn-primary" onclick="resetForm()">Start New Assessment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
