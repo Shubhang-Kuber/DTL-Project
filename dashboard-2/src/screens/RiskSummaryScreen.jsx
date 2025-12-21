@@ -1,0 +1,103 @@
+import React from 'react';
+import { ScreenContainer, RiskBadge, Card, Button } from '../components/index.jsx';
+import { classifyRisk } from '../utils/scoring.js';
+
+/**
+ * Screen 2: Risk Summary
+ * 
+ * Displays overall risk classification with context and CTA
+ */
+export function RiskSummaryScreen({ overallRiskScore, factorScores, onContinue, onBack }) {
+  const riskClassification = classifyRisk(overallRiskScore);
+
+  return (
+    <ScreenContainer
+      title="Your Risk Assessment Summary"
+      subtitle="Based on your responses to academic, emotional, and engagement indicators"
+    >
+      {/* Risk Badge */}
+      <div className="mb-8">
+        <RiskBadge
+          level={riskClassification.level}
+          color={riskClassification.color}
+          badge={riskClassification.badge}
+        />
+      </div>
+
+      {/* Explanation */}
+      <Card className="mb-6">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+          What This Means
+        </h3>
+        <p className="text-gray-700 dark:text-gray-300 mb-4">
+          {riskClassification.description}
+        </p>
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-3">
+          <p className="text-sm text-gray-700 dark:text-gray-300">
+            <strong>📊 Risk Score:</strong> {(overallRiskScore * 100).toFixed(1)}% 
+            {' '}
+            <span className="text-gray-600 dark:text-gray-400">(Probability of needing support)</span>
+          </p>
+        </div>
+      </Card>
+
+      {/* Factor Overview */}
+      <Card className="mb-6">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+          Factor Breakdown
+        </h3>
+        <div className="space-y-3">
+          {Object.entries(factorScores).map(([factorName, score]) => {
+            const riskLevel = score > 0.66 ? 'High' : score > 0.33 ? 'Medium' : 'Low';
+            const color = score > 0.66 ? '#ef4444' : score > 0.33 ? '#f59e0b' : '#10b981';
+            return (
+              <div key={factorName} className="flex items-center justify-between">
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{factorName}</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${score * 100}%`, backgroundColor: color }}
+                    />
+                  </div>
+                  <span className="text-sm font-semibold min-w-16" style={{ color }}>
+                    {riskLevel}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* Call to Action */}
+      <Card className="border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-center mb-6">
+        <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
+          Next Steps
+        </h3>
+        <p className="text-blue-800 dark:text-blue-300 text-sm mb-4">
+          View detailed factor analysis and personalized recommendations to support your success.
+        </p>
+      </Card>
+
+      {/* Navigation */}
+      <div className="flex gap-4">
+        <Button onClick={onBack} variant="secondary" size="md">
+          ← Back
+        </Button>
+        <Button onClick={onContinue} variant="primary" size="md">
+          View Detailed Analysis →
+        </Button>
+      </div>
+
+      {/* Disclaimer */}
+      <div className="mt-8 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+        <p className="text-xs text-yellow-800 dark:text-yellow-200">
+          <strong>⚠️ Important:</strong> This is an early-warning support tool, not a diagnostic system.
+          It identifies students who may benefit from additional support. Seek professional guidance
+          if experiencing mental health concerns.
+        </p>
+      </div>
+    </ScreenContainer>
+  );
+}
