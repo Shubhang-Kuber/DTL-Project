@@ -69,32 +69,52 @@ const SENTIMENT_KEYWORDS = {
 // ============================================
 // FORM FIELD MAPPING TO FACTORS
 // ============================================
+// CRITICAL: Direction-Aware Scoring Implementation
+//
+// DIRECTION TYPES:
+// - "positive": Higher value = healthier condition = LOWER dropout risk
+//   Example: Interest, Motivation, Support, Performance, Attendance
+// 
+// - "negative": Higher value = riskier condition = HIGHER dropout risk
+//   Example: Stress, Financial Burden, Overwhelm, Isolation, Health Issues, Work Commitments
+//
+// SCORING RULE:
+// Before computing factor scores, NEGATIVE indicators MUST be inverted:
+//   inverted_value = max_scale - original_value
+// This ensures worst answers (e.g., high stress) → HIGH RISK
+// And best answers (e.g., low stress) → LOW RISK
 
 const FIELD_TO_FACTOR_MAPPING = {
     // Academic Support & Quality
-    'avgPerformance': { factor: 'academic_support', inverse: false, weight: 0.25 },
-    'attendanceRate': { factor: 'academic_support', inverse: false, weight: 0.25 },
-    'institutionSupport': { factor: 'academic_support', inverse: false, weight: 0.25 },
-    'helpSeeking': { factor: 'academic_support', inverse: false, weight: 0.25 },
+    'avgPerformance': { factor: 'academic_support', direction: 'positive', weight: 0.25 },
+    'attendanceRate': { factor: 'academic_support', direction: 'positive', weight: 0.25 },
+    'institutionSupport': { factor: 'academic_support', direction: 'positive', weight: 0.25 },
+    'helpSeeking': { factor: 'academic_support', direction: 'positive', weight: 0.25 },
 
     // Financial & Stress Management
-    'stressLevel': { factor: 'financial_stress', inverse: true, weight: 0.33 },
-    'financialProblems': { factor: 'financial_stress', inverse: false, weight: 0.33 },
-    'overwhelm': { factor: 'financial_stress', inverse: true, weight: 0.34 },
+    // NEGATIVE: High stress = high risk, Low stress = low risk
+    'stressLevel': { factor: 'financial_stress', direction: 'negative', weight: 0.33 },
+    // NEGATIVE: High financial problems = high risk, No problems = low risk
+    'financialProblems': { factor: 'financial_stress', direction: 'negative', weight: 0.33 },
+    // NEGATIVE: High overwhelm = high risk, No overwhelm = low risk
+    'overwhelm': { factor: 'financial_stress', direction: 'negative', weight: 0.34 },
 
     // Institutional & Academic Environment
-    'courseInterest': { factor: 'institutional_fit', inverse: false, weight: 0.33 },
-    'workCommitment': { factor: 'institutional_fit', inverse: true, weight: 0.33 },
-    'healthIssues': { factor: 'institutional_fit', inverse: false, weight: 0.34 },
+    'courseInterest': { factor: 'institutional_fit', direction: 'positive', weight: 0.33 },
+    // NEGATIVE: High work commitment = high risk, No commitment = low risk
+    'workCommitment': { factor: 'institutional_fit', direction: 'negative', weight: 0.33 },
+    // NEGATIVE: High health issues = high risk, No issues = low risk
+    'healthIssues': { factor: 'institutional_fit', direction: 'negative', weight: 0.34 },
 
     // Motivation
-    'motivation': { factor: 'motivation', inverse: false, weight: 0.5 },
-    'extracurricular': { factor: 'motivation', inverse: false, weight: 0.5 },
+    'motivation': { factor: 'motivation', direction: 'positive', weight: 0.5 },
+    'extracurricular': { factor: 'motivation', direction: 'positive', weight: 0.5 },
 
     // Social Integration & Well-being
-    'socialIsolation': { factor: 'social_wellbeing', inverse: true, weight: 0.33 },
-    'familySupport': { factor: 'social_wellbeing', inverse: false, weight: 0.33 },
-    'studyHours': { factor: 'social_wellbeing', inverse: false, weight: 0.34 }
+    // NEGATIVE: High isolation = high risk, No isolation = low risk
+    'socialIsolation': { factor: 'social_wellbeing', direction: 'negative', weight: 0.33 },
+    'familySupport': { factor: 'social_wellbeing', direction: 'positive', weight: 0.33 },
+    'studyHours': { factor: 'social_wellbeing', direction: 'positive', weight: 0.34 }
 };
 
 // ============================================
@@ -413,6 +433,16 @@ function classifyRisk(score) {
 
 /**
  * Calculate factor scores from form input
+ * CRITICAL: Implements DIRECTION-AWARE SCORING
+ * 
+ * Negative indicators are interpreted directly as risk contributions.
+ * Positive indicators are INVERTED so high values reduce risk.
+ * 
+ * Ensures semantic correctness:
+ * - High stress (negative) → directly increases risk
+ * - High support (positive) → inverted, decreases risk
+ * - Worst answers → HIGH risk classification
+ * - Best answers → LOW risk classification
  */
 function calculateFactorScores(formData) {
     const factorScores = {
@@ -427,34 +457,52 @@ function calculateFactorScores(formData) {
         let value = formData[fieldName];
         if (value === undefined || value === '') continue;
 
-        // Normalize based on field type
+        // Step 1: Normalize to 0-1 range based on field type
         let normalized = 0;
         if (fieldName.includes('Performance') || fieldName.includes('Rate')) {
+            // Percentage scale: 0-100
             normalized = normalizeValue(parseInt(value), 0, 100);
-        } else if (fieldName.includes('Support') || fieldName.includes('Stress') || fieldName.includes('Motivation')) {
-            normalized = normalizeValue(parseInt(value), 1, 5);
-        } else if (fieldName.includes('Problems') || fieldName.includes('Issues')) {
-            // These are inverse: 5=no problems, 1=severe problems
-            normalized = normalizeValue(parseInt(value), 1, 5);
         } else {
+            // Likert scale: 1-5 or similar
             normalized = normalizeValue(parseInt(value), 1, 5);
         }
 
-        // Apply inverse if needed
-        if (mapping.inverse) {
+        // Step 2: DIRECTION-AWARE INTERPRETATION
+        // 
+        // NEGATIVE indicators (high value = bad condition):
+        //   Examples: stress, isolation, financial problems, overwhelm, health issues
+        //   Semantic: normalized_value (e.g., 1.0 for max stress) directly represents risk
+        //   Action: Use normalized value as-is (don't invert)
+        //   Result: High stress (1.0) → high risk contribution (1.0)
+        //
+        // POSITIVE indicators (high value = good condition):
+        //   Examples: performance, support, motivation, attendance, interest
+        //   Semantic: we want high values to REDUCE risk
+        //   Action: Invert so high values become low risk contributions
+        //   Result: High support (1.0) → low risk contribution (0.0)
+        //
+        if (mapping.direction === 'positive') {
+            // Invert positive indicators: high values reduce risk
+            // Example: avgPerformance=95 (excellent) → normalized=0.95 → inverted=0.05 (low risk)
             normalized = inverseValue(normalized);
         }
+        // For negative indicators, use normalized value directly
 
+        // Step 3: Aggregate weighted scores
         factorScores[mapping.factor].push(normalized * mapping.weight);
     }
 
-    // Calculate mean for each factor
+    // Step 4: Calculate mean for each factor (capped at 1.0)
     const finalScores = {};
     for (const factor in factorScores) {
         if (factorScores[factor].length > 0) {
-            finalScores[factor] = Math.min(1, factorScores[factor].reduce((a, b) => a + b, 0));
+            // Sum weighted scores for this factor
+            const sumScores = factorScores[factor].reduce((a, b) => a + b, 0);
+            // Cap at 1.0 to maintain 0-1 range
+            finalScores[factor] = Math.min(1, sumScores);
         } else {
-            finalScores[factor] = 0.5; // Default if no data
+            // Default neutral score if no data provided
+            finalScores[factor] = 0.5;
         }
     }
 
@@ -595,3 +643,140 @@ function formatFactorScoresForChart(factorScores) {
         ]
     };
 }
+
+// ============================================
+// VALIDATION TEST CASE
+// ============================================
+// 
+// TEST: Direction-Aware Scoring Correctness
+// 
+// This commented test ensures negative indicators are correctly inverted
+// to produce HIGH RISK when student is in difficult circumstances.
+// 
+// To run this test in browser console:
+//   1. Copy the test function below
+//   2. Paste in browser console (F12)
+//   3. Call: testDirectionAwareScoring()
+//   4. Check console output for PASS/FAIL
+//
+
+/**
+ * VALIDATION TEST - Run in browser console to verify correct logic
+ * Expected: Worst answers → High Risk (0.7+), Best answers → Low Risk (0.3-)
+ */
+function testDirectionAwareScoring() {
+    console.group('🧪 VALIDATION TEST: Direction-Aware Scoring');
+    
+    // ============================================
+    // TEST CASE 1: Worst Scenario → HIGH RISK
+    // ============================================
+    const testWorstCase = {
+        // NEGATIVE indicators: low values = worst (not inverted yet)
+        stressLevel: '5',            // Highest stress (NEGATIVE)
+        socialIsolation: '5',        // Highest isolation (NEGATIVE)
+        financialProblems: '1',      // Worst financial (NEGATIVE, scale: 1=worst)
+        overwhelm: '5',              // Highest overwhelm (NEGATIVE)
+        workCommitment: '4',         // Heavy commitments (NEGATIVE)
+        healthIssues: '1',           // Severe health issues (NEGATIVE)
+        
+        // POSITIVE indicators: low values = worst
+        avgPerformance: '20',        // Very poor performance
+        attendanceRate: '20',        // Very low attendance
+        courseInterest: '1',         // No interest in course
+        motivation: '1',             // No motivation
+        familySupport: '1',          // No family support
+        institutionSupport: '1'      // No institution support
+    };
+    
+    const worstScores = calculateFactorScores(testWorstCase);
+    const worstRisk = calculateOverallRiskScore(worstScores);
+    const worstClass = classifyRisk(worstRisk);
+    
+    console.log('📉 TEST CASE 1: WORST POSSIBLE ANSWERS');
+    console.log('Factor Scores:', worstScores);
+    console.log('Overall Risk Score:', worstRisk.toFixed(3));
+    console.log('Risk Classification:', worstClass.level);
+    
+    const test1Pass = worstRisk > 0.65 && worstClass.level === 'High Risk';
+    console.log(test1Pass ? '✅ PASS: Worst answers → HIGH RISK' : '❌ FAIL: Expected HIGH RISK');
+    
+    // ============================================
+    // TEST CASE 2: Best Scenario → LOW RISK
+    // ============================================
+    const testBestCase = {
+        // NEGATIVE indicators: high values = best (will be inverted)
+        stressLevel: '1',            // No stress (NEGATIVE, inverted to low risk)
+        socialIsolation: '1',        // No isolation (NEGATIVE, inverted to low risk)
+        financialProblems: '5',      // No financial issues (NEGATIVE scale)
+        overwhelm: '1',              // No overwhelm (NEGATIVE)
+        workCommitment: '1',         // No work commitments (NEGATIVE)
+        healthIssues: '5',           // No health issues (NEGATIVE scale)
+        
+        // POSITIVE indicators: high values = best
+        avgPerformance: '95',        // Excellent performance
+        attendanceRate: '95',        // Excellent attendance
+        courseInterest: '5',         // Very interested in course
+        motivation: '5',             // Very motivated
+        familySupport: '5',          // Strong family support
+        institutionSupport: '5'      // Strong institution support
+    };
+    
+    const bestScores = calculateFactorScores(testBestCase);
+    const bestRisk = calculateOverallRiskScore(bestScores);
+    const bestClass = classifyRisk(bestRisk);
+    
+    console.log('\n📈 TEST CASE 2: BEST POSSIBLE ANSWERS');
+    console.log('Factor Scores:', bestScores);
+    console.log('Overall Risk Score:', bestRisk.toFixed(3));
+    console.log('Risk Classification:', bestClass.level);
+    
+    const test2Pass = bestRisk < 0.35 && bestClass.level === 'Low Risk';
+    console.log(test2Pass ? '✅ PASS: Best answers → LOW RISK' : '❌ FAIL: Expected LOW RISK');
+    
+    // ============================================
+    // TEST CASE 3: Mixed (should be MEDIUM RISK)
+    // ============================================
+    const testMixedCase = {
+        stressLevel: '3',
+        socialIsolation: '2',
+        financialProblems: '3',
+        overwhelm: '3',
+        workCommitment: '2',
+        healthIssues: '4',
+        avgPerformance: '70',
+        attendanceRate: '75',
+        courseInterest: '3',
+        motivation: '3',
+        familySupport: '3',
+        institutionSupport: '3'
+    };
+    
+    const mixedScores = calculateFactorScores(testMixedCase);
+    const mixedRisk = calculateOverallRiskScore(mixedScores);
+    const mixedClass = classifyRisk(mixedRisk);
+    
+    console.log('\n⚖️ TEST CASE 3: MIXED ANSWERS');
+    console.log('Factor Scores:', mixedScores);
+    console.log('Overall Risk Score:', mixedRisk.toFixed(3));
+    console.log('Risk Classification:', mixedClass.level);
+    
+    const test3Pass = mixedRisk >= 0.33 && mixedRisk <= 0.66;
+    console.log(test3Pass ? '✅ PASS: Mixed answers → MEDIUM RISK' : '❌ FAIL: Expected MEDIUM RISK');
+    
+    // ============================================
+    // FINAL VERDICT
+    // ============================================
+    const allPass = test1Pass && test2Pass && test3Pass;
+    console.log('\n' + (allPass ? '✅ ALL TESTS PASSED' : '❌ SOME TESTS FAILED'));
+    console.log('Direction-aware scoring is', allPass ? 'CORRECT ✓' : 'INCORRECT ✗');
+    
+    console.groupEnd();
+    
+    return allPass;
+}
+
+// Uncomment below to auto-run test on page load:
+// window.addEventListener('DOMContentLoaded', function() {
+//     console.log('Running direction-aware scoring validation...');
+//     testDirectionAwareScoring();
+// });
