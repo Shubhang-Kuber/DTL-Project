@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { QUESTIONS } from '../data/questions.js';
+import { generateMockResponses } from '../utils/dataLoader.js';
 import {
   ScreenContainer,
   FormSection,
@@ -54,6 +55,13 @@ export function AssessmentScreen({ onComplete }) {
     if (allQuestionsAnswered) {
       onComplete({ responses, sentiment });
     }
+  };
+
+  const handleLoadSample = (scenario = 'random') => {
+    const sampleResponses = generateMockResponses(scenario);
+    setResponses(sampleResponses);
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -139,6 +147,30 @@ export function AssessmentScreen({ onComplete }) {
           </Button>
         )}
       </div>
+
+      {/* Sample Data Loader (for testing) */}
+      {process.env.NODE_ENV === 'development' && (
+        <Card className="mb-6 border-2 border-purple-200">
+          <h3 className="font-semibold text-gray-800 dark:text-white mb-3">🧪 Testing Tools</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            Load sample responses to test the dashboard (development mode only).
+          </p>
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="secondary" size="sm" onClick={() => handleLoadSample('low')}>
+              Load Low Risk Sample
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => handleLoadSample('medium')}>
+              Load Medium Risk Sample
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => handleLoadSample('high')}>
+              Load High Risk Sample
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => handleLoadSample('random')}>
+              Load Random Sample
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {/* Disclaimer */}
       <div className="mt-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">

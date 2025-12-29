@@ -154,13 +154,14 @@ export function FormSection({ title, description, children }) {
 }
 
 /**
- * FactorChartCard Component
+ * FactorChartCard Component with Tooltip
  */
 export function FactorChartCard({ factorName, factorDef, score }) {
   const riskColor = score > 0.66 ? '#ef4444' : score > 0.33 ? '#f59e0b' : '#10b981';
+  const riskLevel = score > 0.66 ? 'High Risk' : score > 0.33 ? 'Medium Risk' : 'Low Risk';
 
   return (
-    <Card className="text-center">
+    <Card className="text-center group relative" hover={true}>
       <div className="mb-4">
         <h4 className="font-semibold text-gray-800 dark:text-white">{factorName}</h4>
         <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{factorDef.description}</p>
@@ -198,9 +199,26 @@ export function FactorChartCard({ factorName, factorDef, score }) {
           </text>
         </svg>
       </div>
-      <p className="text-sm text-gray-600 dark:text-gray-400">
-        {score > 0.66 ? 'High Risk' : score > 0.33 ? 'Medium Risk' : 'Low Risk'}
+      <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+        {riskLevel}
       </p>
+      {/* Tooltip */}
+      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
+                      opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 
+                      w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg pointer-events-none">
+        <div className="font-semibold mb-1">{factorName}</div>
+        <div className="text-gray-300">{factorDef.description}</div>
+        <div className="mt-2 pt-2 border-t border-gray-700">
+          <strong>Questions assessed:</strong> {factorDef.questions?.length || 0}
+        </div>
+        <div className="mt-1">
+          <strong>Weight:</strong> {Math.round((factorDef.weight || 0) * 100)}%
+        </div>
+        {/* Arrow */}
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+          <div className="w-2 h-2 bg-gray-900 transform rotate-45"></div>
+        </div>
+      </div>
     </Card>
   );
 }
