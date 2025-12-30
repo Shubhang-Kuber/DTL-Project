@@ -33,12 +33,14 @@ function App() {
           onComplete={(data) => {
             // Calculate analysis on submission
             const factorScores = calculateFactorScores(data.responses);
-            const overallScore = calculateOverallRiskScore(factorScores);
+            const sentimentScore = analyzeSentiment(data.sentiment || '');
+            const overallScore = calculateOverallRiskScore(factorScores, sentimentScore);
             const recs = generateRecommendations(factorScores, RECOMMENDATIONS);
             
             setAnalysisData({
               responses: data.responses,
               sentiment: data.sentiment,
+              sentimentScore,
               factorScores,
               overallScore,
               recommendations: recs,
@@ -55,6 +57,7 @@ function App() {
         <RiskSummaryScreen
           overallRiskScore={analysisData?.overallScore || 0}
           factorScores={analysisData?.factorScores || {}}
+          sentimentScore={analysisData?.sentimentScore || 0}
           onContinue={() => setCurrentScreen(2)}
           onBack={() => setCurrentScreen(0)}
         />
@@ -75,7 +78,12 @@ function App() {
       component: (
         <RecommendationsScreen
           recommendations={analysisData?.recommendations || []}
+          analysisData={analysisData}
           onBack={() => setCurrentScreen(2)}
+          onRestart={() => {
+            setAnalysisData(null);
+            setCurrentScreen(0);
+          }}
         />
       ),
     },

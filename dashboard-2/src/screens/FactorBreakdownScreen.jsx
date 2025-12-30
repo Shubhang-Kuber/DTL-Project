@@ -92,6 +92,9 @@ export function FactorBreakdownScreen({ factorScores, onContinue, onBack }) {
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
           Factor-by-Factor Analysis
         </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Hover over each factor card to see detailed information about what it measures.
+        </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.entries(factorScores).map(([factorName, score]) => (
             <FactorChartCard

@@ -8,8 +8,98 @@ import { RECOMMENDATIONS } from '../data/questions.js';
  * Personalized, rule-based suggestions mapped to low factor scores
  * with supportive language and system disclaimer
  */
-export function RecommendationsScreen({ recommendations, onBack }) {
+// Advisor email address - update this with your advisor's email
+const ADVISOR_EMAIL = 'advisor@university.edu'; // TODO: Replace with actual advisor email
+
+export function RecommendationsScreen({ recommendations, analysisData, onBack, onRestart }) {
   const hasRecommendations = recommendations && recommendations.length > 0;
+
+  // Export functionality
+  const handleCopySummary = () => {
+    const summary = generateTextSummary(analysisData, recommendations);
+    navigator.clipboard.writeText(summary).then(() => {
+      alert('Summary copied to clipboard!');
+    }).catch(() => {
+      alert('Failed to copy. Please try again.');
+    });
+  };
+
+  // Open Gmail draft to share with advisor
+  const handleShareWithAdvisor = () => {
+    const summary = generateTextSummary(analysisData, recommendations);
+    const riskLevel = analysisData?.overallScore <= 0.33 ? 'Low Risk' : 
+                     analysisData?.overallScore <= 0.66 ? 'Medium Risk' : 'High Risk';
+    
+    const subject = encodeURIComponent('Student Risk Assessment - Support Request');
+    const body = encodeURIComponent(
+      `Dear Academic Advisor,\n\n` +
+      `I recently completed a self-assessment through the DTL Early-Warning System.\n\n` +
+      `Assessment Results:\n` +
+      `- Risk Level: ${riskLevel}\n` +
+      `- Risk Score: ${analysisData ? (analysisData.overallScore * 100).toFixed(1) : 0}%\n\n` +
+      `Full Assessment Summary:\n${summary}\n\n` +
+      `I would appreciate the opportunity to discuss these findings and available support resources.\n\n` +
+      `Thank you,\n` +
+      `[Your Name]`
+    );
+    
+    // Gmail compose URL
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(ADVISOR_EMAIL)}&su=${subject}&body=${body}`;
+    
+    // Open in new tab
+    window.open(gmailUrl, '_blank');
+  };
+
+  const handleDownloadPDF = () => {
+    const summary = generateTextSummary(analysisData, recommendations);
+    const blob = new Blob([summary], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `dropout-risk-assessment-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const generateTextSummary = (data, recs) => {
+    if (!data) return 'No assessment data available.';
+    
+    const riskLevel = data.overallScore <= 0.33 ? 'Low Risk' : 
+                     data.overallScore <= 0.66 ? 'Medium Risk' : 'High Risk';
+    
+    let summary = 'STUDENT DROPOUT RISK ASSESSMENT SUMMARY\n';
+    summary += '='.repeat(50) + '\n\n';
+    summary += `Assessment Date: ${new Date().toLocaleDateString()}\n`;
+    summary += `Overall Risk Level: ${riskLevel}\n`;
+    summary += `Risk Score: ${(data.overallScore * 100).toFixed(1)}%\n\n`;
+    
+    summary += 'FACTOR BREAKDOWN:\n';
+    summary += '-'.repeat(50) + '\n';
+    Object.entries(data.factorScores || {}).forEach(([factor, score]) => {
+      summary += `${factor}: ${(score * 100).toFixed(1)}%\n`;
+    });
+    summary += '\n';
+    
+    if (recs && recs.length > 0) {
+      summary += 'PERSONALIZED RECOMMENDATIONS:\n';
+      summary += '-'.repeat(50) + '\n';
+      recs.forEach((rec, idx) => {
+        summary += `${idx + 1}. ${rec.title} (${rec.severity.toUpperCase()} PRIORITY)\n`;
+        rec.suggestions.forEach(suggestion => {
+          summary += `   • ${suggestion}\n`;
+        });
+        summary += '\n';
+      });
+    }
+    
+    summary += '\n' + '='.repeat(50) + '\n';
+    summary += 'This is an early-warning support tool, not a final decision system.\n';
+    summary += 'For emergencies, contact your institution\'s crisis services.\n';
+    
+    return summary;
+  };
 
   return (
     <ScreenContainer
@@ -110,9 +200,15 @@ export function RecommendationsScreen({ recommendations, onBack }) {
         <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
           Reach out to one of the resources above, or speak with your academic advisor about next steps.
         </p>
-        <Button variant="success" size="lg">
-          Get Started Today
-        </Button>
+        <div className="flex gap-3 justify-center flex-wrap">
+          <Button 
+            variant="primary" 
+            size="lg"
+            onClick={handleShareWithAdvisor}
+          >
+            Share with Advisor
+          </Button>
+        </div>
       </Card>
 
       {/* Export / Share Options */}
@@ -124,11 +220,11 @@ export function RecommendationsScreen({ recommendations, onBack }) {
           You can share these recommendations with your academic advisor or counselor.
         </p>
         <div className="flex gap-3">
-          <Button variant="secondary" size="md">
+          <Button variant="secondary" size="md" onClick={handleCopySummary}>
             📋 Copy Summary
           </Button>
-          <Button variant="secondary" size="md">
-            📥 Download PDF
+          <Button variant="secondary" size="md" onClick={handleDownloadPDF}>
+            📥 Download Report
           </Button>
         </div>
       </Card>
@@ -138,7 +234,7 @@ export function RecommendationsScreen({ recommendations, onBack }) {
         <Button onClick={onBack} variant="secondary" size="md">
           ← Back to Analysis
         </Button>
-        <Button variant="primary" size="md">
+        <Button variant="primary" size="md" onClick={onRestart}>
           Retake Assessment
         </Button>
       </div>

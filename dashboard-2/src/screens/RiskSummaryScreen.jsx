@@ -7,8 +7,12 @@ import { classifyRisk } from '../utils/scoring.js';
  * 
  * Displays overall risk classification with context and CTA
  */
-export function RiskSummaryScreen({ overallRiskScore, factorScores, onContinue, onBack }) {
+export function RiskSummaryScreen({ overallRiskScore, factorScores, sentimentScore, onContinue, onBack }) {
   const riskClassification = classifyRisk(overallRiskScore);
+  
+  // Format sentiment for display
+  const sentimentLabel = sentimentScore > 0.2 ? 'Positive' : sentimentScore < -0.2 ? 'Negative' : 'Neutral';
+  const sentimentColor = sentimentScore > 0.2 ? '#10b981' : sentimentScore < -0.2 ? '#ef4444' : '#6b7280';
 
   return (
     <ScreenContainer
@@ -32,13 +36,33 @@ export function RiskSummaryScreen({ overallRiskScore, factorScores, onContinue, 
         <p className="text-gray-700 dark:text-gray-300 mb-4">
           {riskClassification.description}
         </p>
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-3">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          This risk level is based on academic, emotional, and engagement factors from your assessment.
+          It reflects the likelihood that you may benefit from additional support services, not a prediction
+          of academic failure or success.
+        </p>
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-3 mb-3">
           <p className="text-sm text-gray-700 dark:text-gray-300">
             <strong>📊 Risk Score:</strong> {(overallRiskScore * 100).toFixed(1)}% 
             {' '}
             <span className="text-gray-600 dark:text-gray-400">(Probability of needing support)</span>
           </p>
         </div>
+        {sentimentScore !== 0 && (
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded p-3">
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+              <strong>💭 Sentiment Analysis:</strong>{' '}
+              <span style={{ color: sentimentColor, fontWeight: '600' }}>{sentimentLabel}</span>
+              {' '}
+              <span className="text-gray-600 dark:text-gray-400">
+                ({sentimentScore > 0 ? '+' : ''}{sentimentScore.toFixed(2)})
+              </span>
+            </p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              Based on your optional feedback text. This helps contextualize your responses.
+            </p>
+          </div>
+        )}
       </Card>
 
       {/* Factor Overview */}

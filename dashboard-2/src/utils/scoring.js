@@ -112,20 +112,37 @@ export function calculateFactorScores(responses) {
  * Calculate overall risk score (weighted average of factors)
  * 
  * @param {Object} factorScores - Factor scores from calculateFactorScores()
+ * @param {number} sentimentScore - Optional sentiment score in [-1, +1]
  * @returns {number} Overall risk score in [0, 1]
  */
-export function calculateOverallRiskScore(factorScores) {
+export function calculateOverallRiskScore(factorScores, sentimentScore = 0) {
   let totalWeightedScore = 0;
   let totalWeight = 0;
 
   Object.entries(FACTORS).forEach(([factorName, factorDef]) => {
-    const score = factorScores[factorName] || 0.5;
+    // Use explicit check for undefined/null, not || operator (which treats 0 as falsy)
+    const score = factorScores[factorName] !== undefined && factorScores[factorName] !== null 
+      ? factorScores[factorName] 
+      : 0.5;
     const weight = factorDef.weight;
     totalWeightedScore += score * weight;
     totalWeight += weight;
   });
 
-  return totalWeight > 0 ? totalWeightedScore : 0.5;
+  let overallScore = totalWeight > 0 ? totalWeightedScore : 0.5;
+
+  // Apply sentiment adjustment if provided
+  // Negative sentiment (closer to -1) increases risk
+  // Positive sentiment (closer to +1) decreases risk
+  if (sentimentScore !== 0) {
+    // Normalize sentiment to [0, 1] range where 0 = positive, 1 = negative
+    const sentimentRiskContribution = (1 - sentimentScore) / 2; // Maps [-1, +1] to [1, 0]
+    // Apply sentiment as a small adjustment (max ±10%)
+    const sentimentAdjustment = (sentimentRiskContribution - 0.5) * 0.2;
+    overallScore = Math.max(0, Math.min(1, overallScore + sentimentAdjustment));
+  }
+
+  return overallScore;
 }
 
 /**
@@ -162,28 +179,62 @@ export function classifyRisk(score) {
 /**
  * Analyze sentiment from optional feedback text
  * 
+ * Uses keyword-based analysis with academic context awareness.
+ * Academic keywords (e.g., "struggling", "difficult") have 2x weight.
+ * 
  * @param {string} text - User feedback
- * @returns {number} Sentiment score in [-1, +1]
+ * @returns {number} Sentiment score in [-1, +1] where +1 = very positive, -1 = very negative
  */
 export function analyzeSentiment(text) {
   if (!text || text.trim().length === 0) return 0;
 
   const lowerText = text.toLowerCase();
+  
+  // Positive sentiment indicators
   const positiveWords = [
     'excited', 'happy', 'confident', 'supported', 'engaged', 'motivated',
     'enjoy', 'good', 'great', 'excellent', 'wonderful', 'grateful',
+    'thriving', 'successful', 'proud', 'optimistic', 'hopeful',
   ];
+  
+  // Negative sentiment indicators
   const negativeWords = [
     'stressed', 'anxious', 'overwhelmed', 'depressed', 'hopeless', 'struggling',
-    'isolated', 'lonely', 'exhausted', 'struggling', 'difficult', 'hard',
+    'isolated', 'lonely', 'exhausted', 'difficult', 'hard', 'worried',
+    'failing', 'lost', 'confused', 'frustrated', 'burnout',
+  ];
+  
+  // Academic context keywords (2x weight)
+  const academicKeywords = [
+    'academic', 'course', 'class', 'study', 'studies', 'assignment',
+    'exam', 'test', 'grade', 'performance', 'learning',
   ];
 
-  let positiveCount = positiveWords.filter(word => lowerText.includes(word)).length;
-  let negativeCount = negativeWords.filter(word => lowerText.includes(word)).length;
+  let positiveCount = 0;
+  let negativeCount = 0;
+  let academicContext = false;
+
+  // Check for academic context
+  academicContext = academicKeywords.some(keyword => lowerText.includes(keyword));
+
+  // Count positive words
+  positiveWords.forEach(word => {
+    if (lowerText.includes(word)) {
+      positiveCount += academicContext ? 2 : 1;
+    }
+  });
+
+  // Count negative words
+  negativeWords.forEach(word => {
+    if (lowerText.includes(word)) {
+      negativeCount += academicContext ? 2 : 1;
+    }
+  });
 
   const total = positiveCount + negativeCount;
   if (total === 0) return 0;
 
+  // Return normalized sentiment: +1 = very positive, -1 = very negative
   return (positiveCount - negativeCount) / total;
 }
 
