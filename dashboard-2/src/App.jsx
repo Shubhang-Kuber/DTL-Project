@@ -4,6 +4,7 @@ import { RiskSummaryScreen } from './screens/RiskSummaryScreen';
 import { FactorBreakdownScreen } from './screens/FactorBreakdownScreen';
 import { RecommendationsScreen } from './screens/RecommendationsScreen';
 import MLVisualizationScreen from './screens/MLVisualizationScreen';
+import RandomForestVisualizer from './screens/RandomForestVisualizer';
 // Legacy scoring (kept for backward compatibility)
 import {
   calculateFactorScores,
@@ -105,6 +106,7 @@ function App() {
           factorScores={analysisData?.factorScores || {}}
           onContinue={() => setCurrentScreen(3)}
           onBack={() => setCurrentScreen(1)}
+          onViewRandomForest={() => setCurrentScreen(5)}
         />
       ),
     },
@@ -130,6 +132,16 @@ function App() {
           scores={analysisData?.responses || null}
           riskScore={analysisData?.overallScore || 0}
           onBack={() => setCurrentScreen(3)}
+        />
+      ),
+    },
+    {
+      name: 'Random Forest Visualizer',
+      component: (
+        <RandomForestVisualizer
+          scores={analysisData?.responses || null}
+          riskScore={analysisData?.overallScore || 0}
+          onBack={() => setCurrentScreen(2)}
         />
       ),
     },

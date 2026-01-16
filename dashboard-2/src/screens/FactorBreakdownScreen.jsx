@@ -23,7 +23,7 @@ import { FACTORS } from '../data/questions.js';
  * Visualizes each factor's contribution to overall risk
  * with tooltips and causality explanations
  */
-export function FactorBreakdownScreen({ factorScores, onContinue, onBack }) {
+export function FactorBreakdownScreen({ factorScores, onContinue, onBack, onViewRandomForest }) {
   // Prepare data for Recharts
   // Shorten factor names for better radar display
   const factorShortNames = {
@@ -255,6 +255,32 @@ export function FactorBreakdownScreen({ factorScores, onContinue, onBack }) {
           to preserve semantic correctness: worst answers → high risk, best answers → low risk.
         </p>
       </Card>
+
+      {/* Random Forest Visualizer CTA */}
+      {onViewRandomForest && (
+        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-300 dark:border-green-700 mb-8">
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="text-5xl">🌲</div>
+            <div className="flex-1 min-w-[200px]">
+              <h3 className="text-lg font-bold text-green-800 dark:text-green-200 mb-1">
+                Learn How Random Forest Works!
+              </h3>
+              <p className="text-sm text-green-700 dark:text-green-300">
+                See an interactive visualization of how our ML algorithm makes predictions 
+                using your answers. Watch decision trees vote in real-time!
+              </p>
+            </div>
+            <Button 
+              onClick={onViewRandomForest}
+              variant="primary"
+              size="lg"
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 whitespace-nowrap"
+            >
+              🌲 Explore Random Forest →
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {/* Navigation */}
       <div className="flex gap-4">
