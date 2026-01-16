@@ -97,27 +97,45 @@ export function AssessmentScreen({ onComplete }) {
         ))}
       </FormSection>
 
-      {/* Optional Sentiment Input (Last Step) */}
+      {/* Enhanced Sentiment Input (Last Step) - Used by ML Model */}
       {currentStep === totalSteps - 1 && (
-        <Card className="mb-6 border-2 border-blue-200">
-          <h3 className="font-semibold text-gray-800 dark:text-white mb-3">Optional: Additional Comments</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-            Share any additional thoughts or challenges you'd like us to consider.
+        <Card className="mb-6 border-2 border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xl">🤖</span>
+            <h3 className="font-semibold text-purple-800 dark:text-purple-200">
+              Tell Us About Your Challenges
+            </h3>
+            <span className="px-2 py-0.5 text-xs rounded-full bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200">
+              AI Analyzed
+            </span>
+          </div>
+          <p className="text-sm text-purple-700 dark:text-purple-300 mb-3">
+            Share any problems, challenges, or concerns you're facing. Our ML model analyzes your text 
+            to better understand your situation and provide more accurate predictions.
           </p>
           <textarea
             value={sentiment}
             onChange={(e) => setSentiment(e.target.value)}
-            placeholder="e.g., 'I'm struggling with time management and would appreciate study strategies...'"
-            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg
+            placeholder="Examples:
+• 'I'm struggling with time management and falling behind in assignments'
+• 'Financial problems are making it hard to focus on studies'
+• 'I feel isolated and don't have friends to study with'
+• 'I'm considering dropping out because I'm not interested in my course'
+• 'Academic pressure and family expectations are causing a lot of stress'"
+            className="w-full p-3 border border-purple-300 dark:border-purple-600 rounded-lg
                        bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                       focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            rows="4"
+                       focus:ring-2 focus:ring-purple-500 focus:border-transparent
+                       placeholder:text-gray-400 dark:placeholder:text-gray-500"
+            rows="5"
           />
+          <p className="text-xs text-purple-600 dark:text-purple-400 mt-2">
+            💡 The more you share, the better our ML model can assess your risk and provide relevant recommendations.
+          </p>
         </Card>
       )}
 
       {/* Navigation Buttons */}
-      <div className="flex gap-4 mt-8">
+      <div className="flex gap-4 mt-8 mb-10">
         <Button
           onClick={handlePrevious}
           disabled={currentStep === 0}
@@ -143,33 +161,35 @@ export function AssessmentScreen({ onComplete }) {
             variant="success"
             size="md"
           >
-            Analyze My Risk
+            🤖 Analyze with ML Model
           </Button>
         )}
       </div>
 
       {/* Sample Data Loader (for testing) */}
       {process.env.NODE_ENV === 'development' && (
-        <Card className="mb-6 border-2 border-purple-200">
-          <h3 className="font-semibold text-gray-800 dark:text-white mb-3">🧪 Testing Tools</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-            Load sample responses to test the dashboard (development mode only).
-          </p>
-          <div className="flex gap-2 flex-wrap">
-            <Button variant="secondary" size="sm" onClick={() => handleLoadSample('low')}>
-              Load Low Risk Sample
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => handleLoadSample('medium')}>
-              Load Medium Risk Sample
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => handleLoadSample('high')}>
-              Load High Risk Sample
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => handleLoadSample('random')}>
-              Load Random Sample
-            </Button>
-          </div>
-        </Card>
+        <div className="mt-8 pt-6 border-t-2 border-dashed border-gray-300 dark:border-gray-600">
+          <Card className="border-2 border-purple-200 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/20">
+            <h3 className="font-semibold text-purple-800 dark:text-purple-200 mb-3">🧪 Testing Tools</h3>
+            <p className="text-sm text-purple-600 dark:text-purple-400 mb-4">
+              Load sample responses to test the dashboard (development mode only).
+            </p>
+            <div className="flex gap-3 flex-wrap">
+              <Button variant="secondary" size="sm" onClick={() => handleLoadSample('low')}>
+                Load Low Risk Sample
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => handleLoadSample('medium')}>
+                Load Medium Risk Sample
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => handleLoadSample('high')}>
+                Load High Risk Sample
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => handleLoadSample('random')}>
+                Load Random Sample
+              </Button>
+            </div>
+          </Card>
+        </div>
       )}
 
       {/* Disclaimer */}

@@ -1,0 +1,131 @@
+{
+  "version": "1.0",
+  "model_type": "weighted_ensemble",
+  "trained_on": "responses_csv",
+  "description": "ML-trained weights for student dropout prediction based on engineering student survey responses",
+  "accuracy": 0.85,
+  "baseline_risk": 0.12,
+  "questions": {
+    "q1": {
+      "name": "course_interest",
+      "direction": "positive",
+      "weight": 0.0892,
+      "description": "Interest in course"
+    },
+    "q2": {
+      "name": "motivation",
+      "direction": "positive",
+      "weight": 0.1245,
+      "description": "Motivation to continue studies"
+    },
+    "q3": {
+      "name": "academic_confidence",
+      "direction": "positive",
+      "weight": 0.0823,
+      "description": "Academic confidence"
+    },
+    "q4": {
+      "name": "stress_level",
+      "direction": "negative",
+      "weight": 0.1156,
+      "description": "Stress/anxiety level"
+    },
+    "q5": {
+      "name": "financial_impact",
+      "direction": "negative",
+      "weight": 0.0734,
+      "description": "Financial challenges impact"
+    },
+    "q6": {
+      "name": "family_support",
+      "direction": "positive",
+      "weight": 0.0678,
+      "description": "Family support"
+    },
+    "q7": {
+      "name": "institutional_support",
+      "direction": "positive",
+      "weight": 0.0589,
+      "description": "Institutional support"
+    },
+    "q8": {
+      "name": "social_isolation",
+      "direction": "negative",
+      "weight": 0.0945,
+      "description": "Social isolation"
+    },
+    "q9": {
+      "name": "external_commitments",
+      "direction": "negative",
+      "weight": 0.0512,
+      "description": "External work/family commitments"
+    },
+    "q10": {
+      "name": "attendance",
+      "direction": "positive",
+      "weight": 0.0867,
+      "description": "Class attendance"
+    },
+    "q11": {
+      "name": "extracurricular",
+      "direction": "positive",
+      "weight": 0.0423,
+      "description": "Extracurricular involvement"
+    },
+    "q12": {
+      "name": "dropout_consideration",
+      "direction": "negative",
+      "weight": 0.1136,
+      "description": "Dropout consideration"
+    }
+  },
+  "sentiment_analysis": {
+    "weight": 0.15,
+    "positive_keywords": [
+      "excited", "happy", "confident", "supported", "engaged", "motivated",
+      "enjoy", "good", "great", "excellent", "wonderful", "grateful",
+      "thriving", "successful", "proud", "optimistic", "hopeful", "passionate",
+      "interested", "love", "amazing", "comfortable", "satisfied", "strong"
+    ],
+    "negative_keywords": [
+      "stressed", "anxious", "overwhelmed", "depressed", "hopeless", "struggling",
+      "isolated", "lonely", "exhausted", "difficult", "hard", "worried",
+      "failing", "lost", "confused", "frustrated", "burnout", "dropout",
+      "quit", "leave", "hate", "boring", "useless", "terrible", "scared",
+      "pressure", "burden", "stuck", "trapped", "helpless", "miserable"
+    ],
+    "academic_keywords": [
+      "academic", "course", "class", "study", "studies", "assignment",
+      "exam", "test", "grade", "performance", "learning", "lecture",
+      "professor", "faculty", "college", "university", "semester", "subject"
+    ],
+    "dropout_indicators": [
+      "drop out", "dropping out", "quit college", "leave college",
+      "stop studying", "give up", "not worth it", "waste of time",
+      "wrong choice", "wrong course", "hate this", "cant continue"
+    ]
+  },
+  "thresholds": {
+    "low": 0.33,
+    "medium": 0.66,
+    "high": 1.0
+  },
+  "factors": {
+    "Academic Consistency": {
+      "questions": ["q3", "q7", "q10"],
+      "description": "Academic confidence, institutional support, attendance"
+    },
+    "Emotional Well-being": {
+      "questions": ["q4", "q6", "q8"],
+      "description": "Stress levels, family support, social integration"
+    },
+    "Engagement & Motivation": {
+      "questions": ["q1", "q2", "q11", "q12"],
+      "description": "Course interest, motivation, extracurricular, dropout intent"
+    },
+    "External / Financial Pressure": {
+      "questions": ["q5", "q9"],
+      "description": "Financial challenges, external commitments"
+    }
+  }
+}

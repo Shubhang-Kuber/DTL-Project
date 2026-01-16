@@ -3,12 +3,19 @@ import { AssessmentScreen } from './screens/AssessmentScreen';
 import { RiskSummaryScreen } from './screens/RiskSummaryScreen';
 import { FactorBreakdownScreen } from './screens/FactorBreakdownScreen';
 import { RecommendationsScreen } from './screens/RecommendationsScreen';
+import MLVisualizationScreen from './screens/MLVisualizationScreen';
+// Legacy scoring (kept for backward compatibility)
 import {
   calculateFactorScores,
   calculateOverallRiskScore,
   generateRecommendations,
   analyzeSentiment,
 } from './utils/scoring';
+// NEW: ML-based prediction engine
+import {
+  predictDropoutRisk,
+  generateMLRecommendations,
+} from './utils/mlPredictor';
 import { RECOMMENDATIONS } from './data/questions';
 import './App.css';
 
@@ -20,6 +27,8 @@ import './App.css';
  * 2. Risk Summary → display overall risk
  * 3. Factor Breakdown → detail each factor
  * 4. Recommendations → personalized suggestions
+ * 
+ * NOW USES ML-BASED PREDICTION from trained Random Forest model
  */
 function App() {
   const [currentScreen, setCurrentScreen] = useState(0);
@@ -31,19 +40,43 @@ function App() {
       component: (
         <AssessmentScreen
           onComplete={(data) => {
-            // Calculate analysis on submission
-            const factorScores = calculateFactorScores(data.responses);
-            const sentimentScore = analyzeSentiment(data.sentiment || '');
-            const overallScore = calculateOverallRiskScore(factorScores, sentimentScore);
-            const recs = generateRecommendations(factorScores, RECOMMENDATIONS);
+            // ===== ML-BASED PREDICTION =====
+            // Use the trained ML model for prediction
+            const mlPrediction = predictDropoutRisk(data.responses, data.sentiment || '');
+            
+            // Generate ML-prioritized recommendations
+            const mlRecs = generateMLRecommendations(mlPrediction.factorScores, RECOMMENDATIONS);
+            
+            // Also keep legacy scoring for comparison (optional)
+            const legacyFactorScores = calculateFactorScores(data.responses);
+            const legacySentimentScore = analyzeSentiment(data.sentiment || '');
+            const legacyOverallScore = calculateOverallRiskScore(legacyFactorScores, legacySentimentScore);
             
             setAnalysisData({
+              // Survey data
               responses: data.responses,
               sentiment: data.sentiment,
-              sentimentScore,
-              factorScores,
-              overallScore,
-              recommendations: recs,
+              
+              // ML Prediction Results (PRIMARY)
+              overallScore: mlPrediction.overallScore,
+              factorScores: mlPrediction.factorScores,
+              sentimentScore: mlPrediction.sentimentAnalysis.score,
+              sentimentAnalysis: mlPrediction.sentimentAnalysis,
+              recommendations: mlRecs,
+              
+              // ML Metadata
+              mlPrediction: mlPrediction,
+              riskLevel: mlPrediction.riskLevel,
+              prediction: mlPrediction.prediction,
+              confidence: mlPrediction.confidence,
+              mlModelUsed: true,
+              
+              // Legacy scores (for comparison/debugging)
+              legacy: {
+                factorScores: legacyFactorScores,
+                overallScore: legacyOverallScore,
+                sentimentScore: legacySentimentScore,
+              }
             });
             
             setCurrentScreen(1);
@@ -58,6 +91,8 @@ function App() {
           overallRiskScore={analysisData?.overallScore || 0}
           factorScores={analysisData?.factorScores || {}}
           sentimentScore={analysisData?.sentimentScore || 0}
+          sentimentAnalysis={analysisData?.sentimentAnalysis || null}
+          mlPrediction={analysisData?.mlPrediction || null}
           onContinue={() => setCurrentScreen(2)}
           onBack={() => setCurrentScreen(0)}
         />
@@ -84,6 +119,17 @@ function App() {
             setAnalysisData(null);
             setCurrentScreen(0);
           }}
+          onViewMLModel={() => setCurrentScreen(4)}
+        />
+      ),
+    },
+    {
+      name: 'ML Visualization',
+      component: (
+        <MLVisualizationScreen
+          scores={analysisData?.responses || null}
+          riskScore={analysisData?.overallScore || 0}
+          onBack={() => setCurrentScreen(3)}
         />
       ),
     },
@@ -91,18 +137,38 @@ function App() {
 
   return (
     <div className="app">
-      {/* Header */}
+      {/* Header - Calming & Welcoming Design */}
       <header className="app-header">
         <div className="app-header-content">
-          <div>
-            <h1 className="app-title">DTL Dashboard</h1>
-            <p className="app-subtitle">Early-Warning System for Student Support</p>
-          </div>
-          {currentScreen > 0 && (
-            <div className="app-progress">
-              <span>Screen {currentScreen} of {screens.length - 1}</span>
+          <div className="header-brand">
+            <div className="header-icon-wrapper">
+              <span className="header-icon">🎓</span>
             </div>
-          )}
+            <div className="header-text">
+              <h1 className="app-title">
+                <span className="title-highlight">Student</span> Wellness Check
+              </h1>
+              <p className="app-subtitle">
+                <span className="subtitle-icon">💙</span>
+                Your well-being matters. Take a moment to reflect.
+              </p>
+            </div>
+          </div>
+          <div className="header-right">
+            {currentScreen > 0 && (
+              <div className="app-progress">
+                <span className="progress-label">Progress</span>
+                <span className="progress-value">{currentScreen} / {screens.length - 1}</span>
+              </div>
+            )}
+            <div className="header-badge">
+              <span>🔒 Anonymous & Confidential</span>
+            </div>
+          </div>
+        </div>
+        {/* Calming Message Bar */}
+        <div className="calming-bar">
+          <p>✨ Take your time. There are no right or wrong answers. Be honest with yourself.</p>
         </div>
       </header>
 
