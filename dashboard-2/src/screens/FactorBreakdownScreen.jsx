@@ -308,14 +308,17 @@ export function FactorBreakdownScreen({ factorScores, onContinue, onBack, onView
         </p>
       </Card>
 
-      {/* Random Forest Visualizer CTA */}
-      {onViewRandomForest && (
-        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-300 dark:border-green-700 mb-4">
+      {/* Random Forest Visualizer CTA - Only show if Random Forest was selected */}
+      {onViewRandomForest && algorithmUsed === 'random_forest' && (
+        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-300 dark:border-green-700 mb-8">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="text-5xl">🌲</div>
             <div className="flex-1 min-w-[200px]">
               <h3 className="text-lg font-bold text-green-800 dark:text-green-200 mb-1">
                 Learn How Random Forest Works!
+                <span className="ml-2 text-xs bg-green-600 text-white px-2 py-1 rounded-full">
+                  YOUR SELECTED ALGORITHM
+                </span>
               </h3>
               <p className="text-sm text-green-700 dark:text-green-300">
                 See an interactive visualization of how decision trees vote together.
@@ -333,19 +336,17 @@ export function FactorBreakdownScreen({ factorScores, onContinue, onBack, onView
         </Card>
       )}
 
-      {/* XGBoost Visualizer CTA */}
-      {onViewXGBoost && (
+      {/* XGBoost Visualizer CTA - Only show if XGBoost was selected */}
+      {onViewXGBoost && algorithmUsed === 'xgboost' && (
         <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-300 dark:border-blue-700 mb-8">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="text-5xl">🚀</div>
             <div className="flex-1 min-w-[200px]">
               <h3 className="text-lg font-bold text-blue-800 dark:text-blue-200 mb-1">
                 Learn How XGBoost + SMOTE Works!
-                {algorithmUsed === 'xgboost' && (
-                  <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
-                    CURRENTLY USED
-                  </span>
-                )}
+                <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
+                  YOUR SELECTED ALGORITHM
+                </span>
               </h3>
               <p className="text-sm text-blue-700 dark:text-blue-300">
                 See how gradient boosting learns from mistakes and SMOTE creates balanced training data.
