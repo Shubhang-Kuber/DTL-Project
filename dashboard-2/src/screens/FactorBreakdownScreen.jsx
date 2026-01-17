@@ -13,6 +13,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  LabelList,
 } from 'recharts';
 import { ScreenContainer, Card, Button, FactorChartCard } from '../components/index.jsx';
 import { FACTORS } from '../data/questions.js';
@@ -177,36 +178,87 @@ export function FactorBreakdownScreen({ factorScores, onContinue, onBack, onView
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
           Risk Score by Factor (Bar View)
         </h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={barData} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
+        <ResponsiveContainer width="100%" height={380}>
+          <BarChart data={barData} margin={{ top: 20, right: 30, left: 30, bottom: 80 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#9ca3af" opacity={0.5} />
             <XAxis 
               dataKey="factor" 
-              tick={{ fontSize: 12, fontWeight: 500, fill: '#374151' }} 
+              tick={{ 
+                fontSize: 12, 
+                fontWeight: 700, 
+                fill: '#60a5fa'
+              }} 
               interval={0}
+              angle={-35}
+              textAnchor="end"
+              height={80}
+              tickLine={{ stroke: '#60a5fa' }}
+              axisLine={{ stroke: '#60a5fa', strokeWidth: 2 }}
             />
             <YAxis 
               domain={[0, 100]} 
-              label={{ value: 'Risk %', angle: -90, position: 'insideLeft', fontSize: 12 }} 
-              tick={{ fontSize: 11 }}
+              tick={{ 
+                fontSize: 13, 
+                fontWeight: 700, 
+                fill: '#60a5fa' 
+              }}
+              tickLine={{ stroke: '#60a5fa' }}
+              axisLine={{ stroke: '#60a5fa', strokeWidth: 2 }}
+              label={{ 
+                value: 'Risk %', 
+                angle: -90, 
+                position: 'insideLeft', 
+                fontSize: 14,
+                fontWeight: 700,
+                fill: '#60a5fa',
+                offset: 0
+              }} 
             />
             <Tooltip 
               formatter={tooltipFormatter}
               contentStyle={{ 
-                backgroundColor: '#f9fafb', 
-                border: '1px solid #d1d5db',
-                borderRadius: '8px'
+                backgroundColor: '#1e293b', 
+                border: '2px solid #60a5fa',
+                borderRadius: '10px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                padding: '10px 14px'
+              }}
+              labelStyle={{
+                color: '#ffffff',
+                fontWeight: 600,
+                marginBottom: '4px'
+              }}
+              itemStyle={{
+                color: '#60a5fa',
+                fontWeight: 500
               }}
             />
             <Bar 
               dataKey="Risk Score" 
-              fill="#3b82f6" 
-              radius={[4, 4, 0, 0]}
-            />
+              fill="url(#barGradient)" 
+              radius={[6, 6, 0, 0]}
+              stroke="#3b82f6"
+              strokeWidth={2}
+            >
+              <LabelList 
+                dataKey="Risk Score" 
+                position="top" 
+                fill="#fbbf24" 
+                fontWeight={700}
+                fontSize={11}
+                formatter={(value) => `${value}%`}
+              />
+            </Bar>
+            <defs>
+              <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#93c5fd" />
+                <stop offset="100%" stopColor="#3b82f6" />
+              </linearGradient>
+            </defs>
           </BarChart>
         </ResponsiveContainer>
-        <p className="text-xs text-gray-600 dark:text-gray-400 mt-4">
-          Taller bars indicate factors requiring more support attention.
+        <p className="text-sm text-gray-700 dark:text-gray-300 mt-4 font-medium">
+          📊 Taller bars indicate factors requiring more support attention.
         </p>
       </Card>
 
