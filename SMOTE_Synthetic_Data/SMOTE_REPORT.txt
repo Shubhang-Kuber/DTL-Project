@@ -1,0 +1,27 @@
+
+SMOTE SYNTHETIC DATA GENERATION REPORT
+======================================
+Generated: 2026-01-17 19:08:22
+
+ORIGINAL DATA:
+- Total students: 40
+- Not At Risk: 36
+- At Risk: 4
+- Imbalance Ratio: 36:4
+
+AFTER SMOTE:
+- Total samples: 72
+- Not At Risk: 36
+- At Risk: 36
+- Synthetic samples created: 32
+
+HOW SMOTE WORKS:
+1. Takes existing at-risk students
+2. Finds their nearest neighbors (similar students)
+3. Creates new points along the line between them
+4. These synthetic points have realistic at-risk patterns
+
+FILES GENERATED:
+1. original_data.csv - Your original 40 student responses
+2. synthetic_at_risk_samples.csv - Only the SMOTE-generated samples
+3. balanced_dataset_with_smote.csv - Combined dataset for training

@@ -24,7 +24,7 @@ import { FACTORS } from '../data/questions.js';
  * Visualizes each factor's contribution to overall risk
  * with tooltips and causality explanations
  */
-export function FactorBreakdownScreen({ factorScores, onContinue, onBack, onViewRandomForest }) {
+export function FactorBreakdownScreen({ factorScores, onContinue, onBack, onViewRandomForest, onViewXGBoost, algorithmUsed }) {
   // Prepare data for Recharts
   // Shorten factor names for better radar display
   const factorShortNames = {
@@ -310,7 +310,7 @@ export function FactorBreakdownScreen({ factorScores, onContinue, onBack, onView
 
       {/* Random Forest Visualizer CTA */}
       {onViewRandomForest && (
-        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-300 dark:border-green-700 mb-8">
+        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-300 dark:border-green-700 mb-4">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="text-5xl">🌲</div>
             <div className="flex-1 min-w-[200px]">
@@ -318,8 +318,7 @@ export function FactorBreakdownScreen({ factorScores, onContinue, onBack, onView
                 Learn How Random Forest Works!
               </h3>
               <p className="text-sm text-green-700 dark:text-green-300">
-                See an interactive visualization of how our ML algorithm makes predictions 
-                using your answers. Watch decision trees vote in real-time!
+                See an interactive visualization of how decision trees vote together.
               </p>
             </div>
             <Button 
@@ -329,6 +328,36 @@ export function FactorBreakdownScreen({ factorScores, onContinue, onBack, onView
               className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 whitespace-nowrap"
             >
               🌲 Explore Random Forest →
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {/* XGBoost Visualizer CTA */}
+      {onViewXGBoost && (
+        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-300 dark:border-blue-700 mb-8">
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="text-5xl">🚀</div>
+            <div className="flex-1 min-w-[200px]">
+              <h3 className="text-lg font-bold text-blue-800 dark:text-blue-200 mb-1">
+                Learn How XGBoost + SMOTE Works!
+                {algorithmUsed === 'xgboost' && (
+                  <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
+                    CURRENTLY USED
+                  </span>
+                )}
+              </h3>
+              <p className="text-sm text-blue-700 dark:text-blue-300">
+                See how gradient boosting learns from mistakes and SMOTE creates balanced training data.
+              </p>
+            </div>
+            <Button 
+              onClick={onViewXGBoost}
+              variant="primary"
+              size="lg"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 whitespace-nowrap"
+            >
+              🚀 Explore XGBoost →
             </Button>
           </div>
         </Card>

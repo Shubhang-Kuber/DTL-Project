@@ -1,108 +1,150 @@
 {
-  "version": "2.0",
-  "model_type": "random_forest",
+  "version": "3.0",
+  "description": "Dual model support: XGBoost (SMOTE) and Random Forest",
   "trained_on": "Responses CSV File.csv",
-  "training_samples": 32,
-  "test_samples": 8,
-  "n_estimators": 50,
-  "description": "Random Forest trained on engineering student survey responses for dropout prediction",
-  "baseline_risk": 0.1,
-  "metrics": {
-    "accuracy": 0.875,
-    "precision": 0.0,
-    "recall": 0.0,
-    "f1_score": 0.0,
-    "specificity": 1.0,
-    "cross_validation": {
-      "accuracy": 0.775,
-      "accuracy_std": 0.187,
-      "f1_score": 0.0,
-      "f1_std": 0.0
+  "smote_applied": true,
+  "training_date": "2026-01-17 19:08:24",
+  "models": {
+    "xgboost": {
+      "name": "XGBoost + SMOTE",
+      "display_name": "XGBoost (Enhanced)",
+      "n_estimators": 100,
+      "max_depth": 4,
+      "learning_rate": 0.1,
+      "metrics": {
+        "accuracy": 1.0,
+        "f1_score": 1.0,
+        "cv_accuracy": 0.8742857142857143,
+        "cv_std": 0.0540932259853826,
+        "confusion_matrix": {
+          "true_negatives": 5,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_positives": 1
+        }
+      },
+      "feature_importance": {
+        "q1": 0.10540050268173218,
+        "q2": 0.22216403484344482,
+        "q3": 0.2641312777996063,
+        "q4": 0.0,
+        "q5": 0.0,
+        "q6": 0.3937629759311676,
+        "q7": 0.014541233889758587,
+        "q8": 0.0,
+        "q9": 0.0,
+        "q10": 0.0,
+        "q11": 0.0
+      }
     },
-    "confusion_matrix": {
-      "true_negatives": 7,
-      "false_positives": 0,
-      "false_negatives": 1,
-      "true_positives": 0
-    },
-    "note": "Low precision/recall/F1 due to severe class imbalance (only 4 at-risk students out of 40 total). Model needs more at-risk samples for better minority class detection."
+    "random_forest": {
+      "name": "Random Forest + SMOTE",
+      "display_name": "Random Forest",
+      "n_estimators": 50,
+      "max_depth": 5,
+      "metrics": {
+        "accuracy": 1.0,
+        "f1_score": 1.0,
+        "cv_accuracy": 0.8457142857142858,
+        "cv_std": 0.05558185318634238,
+        "confusion_matrix": {
+          "true_negatives": 5,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_positives": 1
+        }
+      },
+      "feature_importance": {
+        "q1": 0.1149314437430033,
+        "q2": 0.21781391379320666,
+        "q3": 0.07906493226167885,
+        "q4": 0.0,
+        "q5": 0.09265262756754954,
+        "q6": 0.04753595874771663,
+        "q7": 0.11161770326157107,
+        "q8": 0.13331186371504197,
+        "q9": 0.09231509468885679,
+        "q10": 0.0,
+        "q11": 0.1107564622213752
+      }
+    }
   },
   "questions": {
     "q1": {
       "name": "course_interest",
       "direction": "positive",
-      "weight": 0.1186,
-      "raw_importance": 0.1186,
+      "xgboost_weight": 0.10540050268173218,
+      "random_forest_weight": 0.1149314437430033,
       "description": "Question 1"
     },
     "q2": {
       "name": "motivation",
       "direction": "positive",
-      "weight": 0.1138,
-      "raw_importance": 0.1138,
+      "xgboost_weight": 0.22216403484344482,
+      "random_forest_weight": 0.21781391379320666,
       "description": "Question 2"
     },
     "q3": {
       "name": "academic_confidence",
       "direction": "positive",
-      "weight": 0.0879,
-      "raw_importance": 0.0879,
+      "xgboost_weight": 0.2641312777996063,
+      "random_forest_weight": 0.07906493226167885,
       "description": "Question 3"
     },
     "q4": {
       "name": "stress_level",
       "direction": "negative",
-      "weight": 0.0,
-      "raw_importance": 0.0,
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.0,
       "description": "Question 4"
     },
     "q5": {
       "name": "financial_impact",
       "direction": "negative",
-      "weight": 0.0931,
-      "raw_importance": 0.0931,
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.09265262756754954,
       "description": "Question 5"
     },
     "q6": {
       "name": "family_support",
       "direction": "positive",
-      "weight": 0.0546,
-      "raw_importance": 0.0546,
+      "xgboost_weight": 0.3937629759311676,
+      "random_forest_weight": 0.04753595874771663,
       "description": "Question 6"
     },
     "q7": {
       "name": "institutional_support",
       "direction": "positive",
-      "weight": 0.1158,
-      "raw_importance": 0.1158,
+      "xgboost_weight": 0.014541233889758587,
+      "random_forest_weight": 0.11161770326157107,
       "description": "Question 7"
     },
     "q8": {
       "name": "social_isolation",
       "direction": "negative",
-      "weight": 0.132,
-      "raw_importance": 0.132,
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.13331186371504197,
       "description": "Question 8"
     },
     "q9": {
       "name": "external_commitments",
       "direction": "negative",
-      "weight": 0.1619,
-      "raw_importance": 0.1619,
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.09231509468885679,
       "description": "Question 9"
     },
     "q10": {
       "name": "attendance",
       "direction": "positive",
-      "weight": 0.0,
-      "raw_importance": 0.0,
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.0,
       "description": "Question 10"
     },
     "q11": {
       "name": "extracurricular",
       "direction": "positive",
-      "weight": 0.1223,
-      "raw_importance": 0.1223,
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.1107564622213752,
       "description": "Question 11"
     }
   },
@@ -240,5 +282,11 @@
     "low": 0.33,
     "medium": 0.66,
     "high": 1.0
+  },
+  "smote_info": {
+    "original_samples": 40,
+    "original_at_risk": 4,
+    "synthetic_samples_created": 32,
+    "total_after_smote": 72
   }
 }

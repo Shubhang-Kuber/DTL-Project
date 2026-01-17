@@ -5,6 +5,8 @@ import { FactorBreakdownScreen } from './screens/FactorBreakdownScreen';
 import { RecommendationsScreen } from './screens/RecommendationsScreen';
 import MLVisualizationScreen from './screens/MLVisualizationScreen';
 import RandomForestVisualizer from './screens/RandomForestVisualizer';
+import AlgorithmSelectionScreen from './screens/AlgorithmSelectionScreen';
+import XGBoostVisualizer from './screens/XGBoostVisualizer';
 // Legacy scoring (kept for backward compatibility)
 import {
   calculateFactorScores,
@@ -12,38 +14,54 @@ import {
   generateRecommendations,
   analyzeSentiment,
 } from './utils/scoring';
-// NEW: ML-based prediction engine
+// NEW: ML-based prediction engine with dual algorithm support
 import {
   predictDropoutRisk,
   generateMLRecommendations,
+  ALGORITHMS,
 } from './utils/mlPredictor';
+import mlConfig from './data/ml_config.json';
 import { RECOMMENDATIONS } from './data/questions';
 import './App.css';
 
 /**
  * Main App Component
  * 
- * State machine for 4-screen flow:
+ * State machine for multi-screen flow:
+ * 0. Algorithm Selection → choose between Random Forest and XGBoost
  * 1. Assessment → collect survey responses
  * 2. Risk Summary → display overall risk
  * 3. Factor Breakdown → detail each factor
  * 4. Recommendations → personalized suggestions
  * 
- * NOW USES ML-BASED PREDICTION from trained Random Forest model
+ * NOW USES DUAL ML-BASED PREDICTION: Random Forest OR XGBoost (with SMOTE)
  */
 function App() {
   const [currentScreen, setCurrentScreen] = useState(0);
   const [analysisData, setAnalysisData] = useState(null);
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState(ALGORITHMS.XGBOOST);
 
   const screens = [
+    {
+      name: 'Algorithm Selection',
+      component: (
+        <AlgorithmSelectionScreen
+          onSelectAlgorithm={(algorithm) => {
+            setSelectedAlgorithm(algorithm);
+            setCurrentScreen(1);
+          }}
+          mlConfig={mlConfig}
+        />
+      ),
+    },
     {
       name: 'Assessment',
       component: (
         <AssessmentScreen
           onComplete={(data) => {
-            // ===== ML-BASED PREDICTION =====
-            // Use the trained ML model for prediction
-            const mlPrediction = predictDropoutRisk(data.responses, data.sentiment || '');
+            // ===== ML-BASED PREDICTION WITH SELECTED ALGORITHM =====
+            // Use the selected ML model for prediction
+            const mlPrediction = predictDropoutRisk(data.responses, data.sentiment || '', selectedAlgorithm);
             
             // Generate ML-prioritized recommendations
             const mlRecs = generateMLRecommendations(mlPrediction.factorScores, RECOMMENDATIONS);
@@ -71,6 +89,8 @@ function App() {
               prediction: mlPrediction.prediction,
               confidence: mlPrediction.confidence,
               mlModelUsed: true,
+              algorithmUsed: mlPrediction.algorithmUsed,
+              algorithmName: mlPrediction.algorithmName,
               
               // Legacy scores (for comparison/debugging)
               legacy: {
@@ -80,7 +100,7 @@ function App() {
               }
             });
             
-            setCurrentScreen(1);
+            setCurrentScreen(2);
           }}
         />
       ),
@@ -94,8 +114,9 @@ function App() {
           sentimentScore={analysisData?.sentimentScore || 0}
           sentimentAnalysis={analysisData?.sentimentAnalysis || null}
           mlPrediction={analysisData?.mlPrediction || null}
-          onContinue={() => setCurrentScreen(2)}
-          onBack={() => setCurrentScreen(0)}
+          algorithmUsed={analysisData?.algorithmName || selectedAlgorithm}
+          onContinue={() => setCurrentScreen(3)}
+          onBack={() => setCurrentScreen(1)}
         />
       ),
     },
@@ -104,9 +125,11 @@ function App() {
       component: (
         <FactorBreakdownScreen
           factorScores={analysisData?.factorScores || {}}
-          onContinue={() => setCurrentScreen(3)}
-          onBack={() => setCurrentScreen(1)}
-          onViewRandomForest={() => setCurrentScreen(5)}
+          onContinue={() => setCurrentScreen(4)}
+          onBack={() => setCurrentScreen(2)}
+          onViewRandomForest={() => setCurrentScreen(6)}
+          onViewXGBoost={() => setCurrentScreen(7)}
+          algorithmUsed={selectedAlgorithm}
         />
       ),
     },
@@ -116,12 +139,12 @@ function App() {
         <RecommendationsScreen
           recommendations={analysisData?.recommendations || []}
           analysisData={analysisData}
-          onBack={() => setCurrentScreen(2)}
+          onBack={() => setCurrentScreen(3)}
           onRestart={() => {
             setAnalysisData(null);
             setCurrentScreen(0);
           }}
-          onViewMLModel={() => setCurrentScreen(4)}
+          onViewMLModel={() => setCurrentScreen(5)}
         />
       ),
     },
@@ -131,7 +154,7 @@ function App() {
         <MLVisualizationScreen
           scores={analysisData?.responses || null}
           riskScore={analysisData?.overallScore || 0}
-          onBack={() => setCurrentScreen(3)}
+          onBack={() => setCurrentScreen(4)}
         />
       ),
     },
@@ -141,7 +164,16 @@ function App() {
         <RandomForestVisualizer
           scores={analysisData?.responses || null}
           riskScore={analysisData?.overallScore || 0}
-          onBack={() => setCurrentScreen(2)}
+          onBack={() => setCurrentScreen(3)}
+        />
+      ),
+    },
+    {
+      name: 'XGBoost Visualizer',
+      component: (
+        <XGBoostVisualizer
+          scores={analysisData}
+          onBack={() => setCurrentScreen(3)}
         />
       ),
     },

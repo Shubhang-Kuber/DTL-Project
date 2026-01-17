@@ -1,17 +1,31 @@
 /**
  * ML-Based Prediction Engine
  * 
- * This module implements the trained ML model for student dropout prediction.
- * It uses weights derived from Random Forest training on the Responses CSV data.
+ * This module implements trained ML models for student dropout prediction.
+ * Supports both Random Forest and XGBoost algorithms.
  * 
  * Features:
- * - ML-trained feature weights
+ * - Dual algorithm support (Random Forest & XGBoost)
  * - Direction-aware scoring (positive/negative indicators)
  * - Enhanced sentiment analysis for text input
  * - Dropout keyword detection
+ * - SMOTE-balanced training data
  */
 
 import mlConfig from '../data/ml_config.json';
+
+// Available algorithms
+export const ALGORITHMS = {
+  RANDOM_FOREST: 'random_forest',
+  XGBOOST: 'xgboost'
+};
+
+/**
+ * Get the ML config object
+ */
+export function getMLConfig() {
+  return mlConfig;
+}
 
 /**
  * Normalize a value to [0, 1] range
@@ -98,21 +112,27 @@ export function analyzeTextSentiment(text) {
 
 /**
  * ML-Based Risk Prediction
- * Uses trained weights from Random Forest model
+ * Uses trained weights from either Random Forest or XGBoost model
  * 
  * @param {Object} responses - Survey responses { q1: 4, q2: 5, ... }
  * @param {string} sentimentText - Optional text input for sentiment analysis
+ * @param {string} algorithm - 'random_forest' or 'xgboost' (default: 'xgboost')
  * @returns {Object} { 
  *   overallScore: number,
  *   prediction: 'Low Risk' | 'Medium Risk' | 'High Risk',
  *   confidence: number,
  *   factorScores: object,
- *   sentimentAnalysis: object
+ *   sentimentAnalysis: object,
+ *   algorithmUsed: string
  * }
  */
-export function predictDropoutRisk(responses, sentimentText = '') {
+export function predictDropoutRisk(responses, sentimentText = '', algorithm = ALGORITHMS.XGBOOST) {
   const questionConfig = mlConfig.questions;
   const factors = mlConfig.factors;
+  const modelInfo = mlConfig.models?.[algorithm] || mlConfig.models?.xgboost;
+  
+  // Get the weight key based on algorithm
+  const weightKey = algorithm === ALGORITHMS.XGBOOST ? 'xgboost_weight' : 'random_forest_weight';
   
   // Step 1: Calculate weighted risk score from responses
   let totalWeightedRisk = 0;
@@ -139,16 +159,18 @@ export function predictDropoutRisk(responses, sentimentText = '') {
       riskContribution = normalized; // Keep: high value → high risk
     }
 
-    // Apply ML-trained weight
-    const weightedRisk = riskContribution * config.weight;
+    // Apply ML-trained weight based on selected algorithm
+    const weight = config[weightKey] || config.weight || 0.1;
+    const weightedRisk = riskContribution * weight;
     totalWeightedRisk += weightedRisk;
-    totalWeight += config.weight;
+    totalWeight += weight;
 
     questionScores[qId] = {
       raw: numValue,
       normalized,
       riskContribution,
-      weighted: weightedRisk
+      weighted: weightedRisk,
+      weight: weight
     };
   });
 
@@ -221,6 +243,11 @@ export function predictDropoutRisk(responses, sentimentText = '') {
   const totalQuestions = Object.keys(questionConfig).length;
   const confidence = answeredQuestions / totalQuestions;
 
+  // Get algorithm display name
+  const algorithmName = algorithm === ALGORITHMS.XGBOOST 
+    ? 'XGBoost + SMOTE' 
+    : 'Random Forest';
+
   return {
     overallScore,
     prediction,
@@ -232,22 +259,28 @@ export function predictDropoutRisk(responses, sentimentText = '') {
     sentimentAnalysis,
     questionScores,
     mlModelUsed: true,
-    modelVersion: mlConfig.version
+    modelVersion: mlConfig.version,
+    algorithmUsed: algorithm,
+    algorithmName: algorithmName,
+    modelMetrics: modelInfo?.metrics || {}
   };
 }
 
 /**
- * Get feature importance from ML model
+ * Get feature importance from ML model for a specific algorithm
+ * @param {string} algorithm - 'random_forest' or 'xgboost'
  * @returns {Array} Sorted list of features by importance
  */
-export function getFeatureImportance() {
+export function getFeatureImportance(algorithm = ALGORITHMS.XGBOOST) {
   const questions = mlConfig.questions;
+  const weightKey = algorithm === ALGORITHMS.XGBOOST ? 'xgboost_weight' : 'random_forest_weight';
+  
   return Object.entries(questions)
     .map(([qId, config]) => ({
       questionId: qId,
       name: config.name,
       description: config.description,
-      weight: config.weight,
+      weight: config[weightKey] || config.weight || 0,
       direction: config.direction
     }))
     .sort((a, b) => b.weight - a.weight);
@@ -309,5 +342,7 @@ export default {
   analyzeTextSentiment,
   getFeatureImportance,
   generateMLRecommendations,
-  mlConfig
+  getMLConfig,
+  mlConfig,
+  ALGORITHMS
 };
