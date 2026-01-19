@@ -127,29 +127,123 @@ export function csvRowToFormResponses(csvRow, fieldMapping = {}) {
 /**
  * Generate mock form responses for testing
  * 
+ * Updated for 21 questions with predefined values that result in expected risk levels.
+ * 
+ * Question directions:
+ * - POSITIVE (higher = better): q1, q2, q3, q4, q5, q6, q9, q12, q13, q14, q15, q20
+ * - NEGATIVE (higher = worse): q7, q8, q10, q11, q16, q17, q18, q19, q21
+ * 
  * @param {string} scenario - 'low', 'medium', 'high', or 'random'
  * @returns {Object} Form responses: { q1: 4, q2: 5, ... }
  */
 export function generateMockResponses(scenario = 'random') {
-  const responses = {};
-
   const scenarios = {
+    // ============ LOW RISK PROFILE ============
+    // High positive indicators, low negative indicators
+    // Expected: Overall risk < 33%, "Low Risk" classification
     low: {
-      // Low risk: high positive indicators, low negative indicators
-      q1: 5, q2: 5, q3: 5, q4: 1, q5: 1, q6: 5, q7: 5, q8: 1, q9: 1, q10: 5, q11: 5, q12: 1,
+      // Academic Consistency (positive direction - high values = good)
+      q1: 5,  // Academic confidence - Very confident
+      q2: 5,  // Faculty help seeking - Always seek help
+      q3: 5,  // Teaching quality - Excellent
+      q4: 5,  // Academic support availability - Very available
+      q5: 5,  // Admin support satisfaction - Very satisfied
+      q6: 4,  // Counseling frequency - Monthly
+
+      // Emotional Well-being (mixed directions)
+      q7: 1,  // Stress level (negative) - No stress
+      q8: 1,  // Social isolation (negative) - Never isolated
+      q9: 5,  // Family support (positive) - Strong support
+      q10: 1, // Workload overwhelm (negative) - Never overwhelmed
+      q11: 1, // Health issues (negative) - No issues
+
+      // Engagement & Motivation (mixed directions)
+      q12: 5, // Course interest (positive) - Very interested
+      q13: 5, // Study motivation (positive) - Very motivated
+      q14: 5, // Extracurricular (positive) - Regularly engaged
+      q15: 5, // Attendance rate (positive) - 90% and above
+      q16: 1, // Dropout consideration (negative) - Never considered
+
+      // External / Financial Pressure (mixed directions)
+      q17: 1, // Financial problems (negative) - No problems
+      q18: 1, // Scholarship/loan dependency (negative) - No dependency
+      q19: 1, // External commitments (negative) - No commitments
+      q20: 5, // Study hours (positive) - More than 6 hours
+      q21: 1, // Family dependents (negative) - None
     },
+
+    // ============ MEDIUM RISK PROFILE ============
+    // Mixed indicators, moderate scores
+    // Expected: Overall risk 33-66%, "Medium Risk" classification
     medium: {
-      // Medium risk: mixed responses
-      q1: 3, q2: 3, q3: 3, q4: 3, q5: 3, q6: 3, q7: 3, q8: 3, q9: 3, q10: 3, q11: 3, q12: 3,
+      // Academic Consistency
+      q1: 3,  // Academic confidence - Moderate
+      q2: 3,  // Faculty help seeking - Sometimes
+      q3: 3,  // Teaching quality - Average
+      q4: 3,  // Academic support availability - Moderate
+      q5: 3,  // Admin support satisfaction - Neutral
+      q6: 2,  // Counseling frequency - Rarely
+
+      // Emotional Well-being
+      q7: 3,  // Stress level - Moderate stress
+      q8: 3,  // Social isolation - Sometimes isolated
+      q9: 3,  // Family support - Moderate support
+      q10: 3, // Workload overwhelm - Sometimes
+      q11: 2, // Health issues - Minor issues
+
+      // Engagement & Motivation
+      q12: 3, // Course interest - Moderate interest
+      q13: 3, // Study motivation - Moderate
+      q14: 3, // Extracurricular - Occasionally
+      q15: 3, // Attendance rate - 70-79%
+      q16: 3, // Dropout consideration - Maybe
+
+      // External / Financial Pressure
+      q17: 3, // Financial problems - Some impact
+      q18: 3, // Scholarship/loan dependency - Moderate
+      q19: 2, // External commitments - Some
+      q20: 3, // Study hours - 2-4 hours
+      q21: 3, // Family dependents - Moderate
     },
+
+    // ============ HIGH RISK PROFILE ============
+    // Low positive indicators, high negative indicators
+    // Expected: Overall risk > 66%, "High Risk" classification
     high: {
-      // High risk: low positive indicators, high negative indicators
-      q1: 1, q2: 1, q3: 1, q4: 5, q5: 5, q6: 1, q7: 1, q8: 5, q9: 5, q10: 1, q11: 1, q12: 5,
+      // Academic Consistency (low values for positive direction)
+      q1: 1,  // Academic confidence - Not confident
+      q2: 1,  // Faculty help seeking - Never seek help
+      q3: 2,  // Teaching quality - Poor
+      q4: 1,  // Academic support availability - Not available
+      q5: 1,  // Admin support satisfaction - Not satisfied
+      q6: 1,  // Counseling frequency - Never
+
+      // Emotional Well-being (high values for negative direction)
+      q7: 5,  // Stress level - Extremely stressed
+      q8: 5,  // Social isolation - Always isolated
+      q9: 1,  // Family support - No support
+      q10: 5, // Workload overwhelm - Always overwhelmed
+      q11: 4, // Health issues - Significant issues
+
+      // Engagement & Motivation
+      q12: 1, // Course interest - Not interested
+      q13: 1, // Study motivation - Not motivated
+      q14: 1, // Extracurricular - Never
+      q15: 1, // Attendance rate - Below 40%
+      q16: 5, // Dropout consideration - Definitely yes
+
+      // External / Financial Pressure
+      q17: 5, // Financial problems - Greatly affected
+      q18: 5, // Scholarship/loan dependency - Fully dependent
+      q19: 5, // External commitments - Multiple commitments
+      q20: 1, // Study hours - Less than 1 hour
+      q21: 5, // Family dependents - 5 or more
     },
+
+    // ============ RANDOM PROFILE ============
     random: () => {
-      // Random responses
       const mock = {};
-      for (let i = 1; i <= 12; i++) {
+      for (let i = 1; i <= 21; i++) {
         mock[`q${i}`] = Math.floor(Math.random() * 5) + 1;
       }
       return mock;

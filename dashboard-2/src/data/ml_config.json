@@ -1,9 +1,10 @@
 {
-  "version": "3.0",
-  "description": "Dual model support: XGBoost (SMOTE) and Random Forest",
+  "version": "4.0",
+  "description": "Dual model support with 21 questions: XGBoost (SMOTE) and Random Forest",
   "trained_on": "Responses CSV File.csv",
+  "num_questions": 21,
   "smote_applied": true,
-  "training_date": "2026-01-17 19:08:24",
+  "training_date": "2026-01-18 17:42:29",
   "models": {
     "xgboost": {
       "name": "XGBoost + SMOTE",
@@ -14,27 +15,31 @@
       "metrics": {
         "accuracy": 1.0,
         "f1_score": 1.0,
-        "cv_accuracy": 0.8742857142857143,
-        "cv_std": 0.0540932259853826,
-        "confusion_matrix": {
-          "true_negatives": 5,
-          "false_positives": 0,
-          "false_negatives": 0,
-          "true_positives": 1
-        }
+        "cv_accuracy": 1.0,
+        "cv_std": 0.0
       },
       "feature_importance": {
-        "q1": 0.10540050268173218,
-        "q2": 0.22216403484344482,
-        "q3": 0.2641312777996063,
+        "q1": 0.0,
+        "q2": 0.0,
+        "q3": 0.0,
         "q4": 0.0,
         "q5": 0.0,
-        "q6": 0.3937629759311676,
-        "q7": 0.014541233889758587,
+        "q6": 0.0,
+        "q7": 0.0,
         "q8": 0.0,
         "q9": 0.0,
         "q10": 0.0,
-        "q11": 0.0
+        "q11": 0.0,
+        "q12": 0.0,
+        "q13": 0.0,
+        "q14": 0.0,
+        "q15": 0.0,
+        "q16": 1.0,
+        "q17": 0.0,
+        "q18": 0.0,
+        "q19": 0.0,
+        "q20": 0.0,
+        "q21": 0.0
       }
     },
     "random_forest": {
@@ -43,250 +48,291 @@
       "n_estimators": 50,
       "max_depth": 5,
       "metrics": {
-        "accuracy": 1.0,
-        "f1_score": 1.0,
-        "cv_accuracy": 0.8457142857142858,
-        "cv_std": 0.05558185318634238,
-        "confusion_matrix": {
-          "true_negatives": 5,
-          "false_positives": 0,
-          "false_negatives": 0,
-          "true_positives": 1
-        }
+        "accuracy": 0.8333333333333334,
+        "f1_score": 0.0,
+        "cv_accuracy": 0.9846153846153847,
+        "cv_std": 0.03076923076923075
       },
       "feature_importance": {
-        "q1": 0.1149314437430033,
-        "q2": 0.21781391379320666,
-        "q3": 0.07906493226167885,
-        "q4": 0.0,
-        "q5": 0.09265262756754954,
-        "q6": 0.04753595874771663,
-        "q7": 0.11161770326157107,
-        "q8": 0.13331186371504197,
-        "q9": 0.09231509468885679,
-        "q10": 0.0,
-        "q11": 0.1107564622213752
+        "q1": 0.023220128648885688,
+        "q2": 0.03809565853545828,
+        "q3": 0.008783583971862734,
+        "q4": 0.0037350561880698397,
+        "q5": 0.1253318808145444,
+        "q6": 0.007677889390412076,
+        "q7": 0.006453855049926074,
+        "q8": 0.06857872659729634,
+        "q9": 0.008696066319069507,
+        "q10": 0.004887229302769809,
+        "q11": 0.002228897305297985,
+        "q12": 0.01954316409267591,
+        "q13": 0.02908568801234317,
+        "q14": 0.026140591534350364,
+        "q15": 0.053173445368824554,
+        "q16": 0.30145849841267713,
+        "q17": 0.09142353236725487,
+        "q18": 0.0007558515080066791,
+        "q19": 0.0017546786626777028,
+        "q20": 0.1330497758709741,
+        "q21": 0.0459258020466227
       }
     }
   },
+  "smote_info": {
+    "original_samples": 40,
+    "original_at_risk": 4,
+    "synthetic_samples_created": 28,
+    "total_after_smote": 62,
+    "k_neighbors_used": 2
+  },
   "questions": {
     "q1": {
-      "name": "course_interest",
+      "name": "academic_confidence",
+      "factor": "Academic Consistency",
       "direction": "positive",
-      "xgboost_weight": 0.10540050268173218,
-      "random_forest_weight": 0.1149314437430033,
-      "description": "Question 1"
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.023220128648885688
     },
     "q2": {
-      "name": "motivation",
+      "name": "faculty_help_seeking",
+      "factor": "Academic Consistency",
       "direction": "positive",
-      "xgboost_weight": 0.22216403484344482,
-      "random_forest_weight": 0.21781391379320666,
-      "description": "Question 2"
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.03809565853545828
     },
     "q3": {
-      "name": "academic_confidence",
+      "name": "teaching_quality",
+      "factor": "Academic Consistency",
       "direction": "positive",
-      "xgboost_weight": 0.2641312777996063,
-      "random_forest_weight": 0.07906493226167885,
-      "description": "Question 3"
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.008783583971862734
     },
     "q4": {
-      "name": "stress_level",
-      "direction": "negative",
+      "name": "academic_support_availability",
+      "factor": "Academic Consistency",
+      "direction": "positive",
       "xgboost_weight": 0.0,
-      "random_forest_weight": 0.0,
-      "description": "Question 4"
+      "random_forest_weight": 0.0037350561880698397
     },
     "q5": {
-      "name": "financial_impact",
-      "direction": "negative",
+      "name": "admin_support_satisfaction",
+      "factor": "Academic Consistency",
+      "direction": "positive",
       "xgboost_weight": 0.0,
-      "random_forest_weight": 0.09265262756754954,
-      "description": "Question 5"
+      "random_forest_weight": 0.1253318808145444
     },
     "q6": {
-      "name": "family_support",
+      "name": "counseling_frequency",
+      "factor": "Academic Consistency",
       "direction": "positive",
-      "xgboost_weight": 0.3937629759311676,
-      "random_forest_weight": 0.04753595874771663,
-      "description": "Question 6"
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.007677889390412076
     },
     "q7": {
-      "name": "institutional_support",
-      "direction": "positive",
-      "xgboost_weight": 0.014541233889758587,
-      "random_forest_weight": 0.11161770326157107,
-      "description": "Question 7"
+      "name": "stress_level",
+      "factor": "Emotional Well-being",
+      "direction": "negative",
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.006453855049926074
     },
     "q8": {
       "name": "social_isolation",
+      "factor": "Emotional Well-being",
       "direction": "negative",
       "xgboost_weight": 0.0,
-      "random_forest_weight": 0.13331186371504197,
-      "description": "Question 8"
+      "random_forest_weight": 0.06857872659729634
     },
     "q9": {
-      "name": "external_commitments",
-      "direction": "negative",
+      "name": "family_support",
+      "factor": "Emotional Well-being",
+      "direction": "positive",
       "xgboost_weight": 0.0,
-      "random_forest_weight": 0.09231509468885679,
-      "description": "Question 9"
+      "random_forest_weight": 0.008696066319069507
     },
     "q10": {
-      "name": "attendance",
-      "direction": "positive",
+      "name": "workload_overwhelm",
+      "factor": "Emotional Well-being",
+      "direction": "negative",
       "xgboost_weight": 0.0,
-      "random_forest_weight": 0.0,
-      "description": "Question 10"
+      "random_forest_weight": 0.004887229302769809
     },
     "q11": {
-      "name": "extracurricular",
+      "name": "health_issues",
+      "factor": "Emotional Well-being",
+      "direction": "negative",
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.002228897305297985
+    },
+    "q12": {
+      "name": "course_interest",
+      "factor": "Engagement & Motivation",
       "direction": "positive",
       "xgboost_weight": 0.0,
-      "random_forest_weight": 0.1107564622213752,
-      "description": "Question 11"
+      "random_forest_weight": 0.01954316409267591
+    },
+    "q13": {
+      "name": "study_motivation",
+      "factor": "Engagement & Motivation",
+      "direction": "positive",
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.02908568801234317
+    },
+    "q14": {
+      "name": "extracurricular_engagement",
+      "factor": "Engagement & Motivation",
+      "direction": "positive",
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.026140591534350364
+    },
+    "q15": {
+      "name": "attendance_rate",
+      "factor": "Engagement & Motivation",
+      "direction": "positive",
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.053173445368824554
+    },
+    "q16": {
+      "name": "dropout_consideration",
+      "factor": "Engagement & Motivation",
+      "direction": "negative",
+      "xgboost_weight": 1.0,
+      "random_forest_weight": 0.30145849841267713
+    },
+    "q17": {
+      "name": "financial_problems",
+      "factor": "External / Financial Pressure",
+      "direction": "negative",
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.09142353236725487
+    },
+    "q18": {
+      "name": "scholarship_loan_dependency",
+      "factor": "External / Financial Pressure",
+      "direction": "negative",
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.0007558515080066791
+    },
+    "q19": {
+      "name": "external_commitments",
+      "factor": "External / Financial Pressure",
+      "direction": "negative",
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.0017546786626777028
+    },
+    "q20": {
+      "name": "study_hours",
+      "factor": "External / Financial Pressure",
+      "direction": "positive",
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.1330497758709741
+    },
+    "q21": {
+      "name": "family_dependents",
+      "factor": "External / Financial Pressure",
+      "direction": "negative",
+      "xgboost_weight": 0.0,
+      "random_forest_weight": 0.0459258020466227
     }
   },
   "factors": {
-    "Engagement & Motivation": {
+    "Academic Consistency": {
+      "description": "Academic confidence, faculty support, teaching quality, institutional support",
+      "weight": 0.25,
       "questions": [
         "q1",
-        "q2"
-      ],
-      "weight": 0.25
-    },
-    "Academic Consistency": {
-      "questions": [
+        "q2",
         "q3",
-        "q7",
-        "q10"
-      ],
-      "weight": 0.25
+        "q4",
+        "q5",
+        "q6"
+      ]
     },
     "Emotional Well-being": {
+      "description": "Stress levels, social integration, family support, health, workload management",
+      "weight": 0.25,
       "questions": [
-        "q4",
-        "q6",
-        "q8"
-      ],
-      "weight": 0.25
+        "q7",
+        "q8",
+        "q9",
+        "q10",
+        "q11"
+      ]
+    },
+    "Engagement & Motivation": {
+      "description": "Course interest, motivation, extracurricular involvement, attendance, dropout consideration",
+      "weight": 0.25,
+      "questions": [
+        "q12",
+        "q13",
+        "q14",
+        "q15",
+        "q16"
+      ]
     },
     "External / Financial Pressure": {
+      "description": "Financial challenges, scholarships/loans, work commitments, study time, family dependents",
+      "weight": 0.25,
       "questions": [
-        "q5",
-        "q9",
-        "q11"
-      ],
-      "weight": 0.25
+        "q17",
+        "q18",
+        "q19",
+        "q20",
+        "q21"
+      ]
     }
   },
   "sentiment_analysis": {
     "weight": 0.15,
     "positive_keywords": [
+      "enjoy",
+      "love",
       "excited",
       "happy",
       "confident",
-      "supported",
-      "engaged",
       "motivated",
-      "enjoy",
-      "good",
-      "great",
-      "excellent",
-      "wonderful",
-      "grateful",
-      "thriving",
-      "successful",
-      "proud",
-      "optimistic",
-      "hopeful",
-      "passionate",
       "interested",
-      "love",
-      "amazing",
-      "comfortable",
-      "satisfied",
-      "strong"
+      "supported",
+      "grateful",
+      "optimistic"
     ],
     "negative_keywords": [
       "stressed",
       "anxious",
       "overwhelmed",
+      "struggling",
+      "worried",
+      "lonely",
+      "isolated",
       "depressed",
       "hopeless",
-      "struggling",
-      "isolated",
-      "lonely",
-      "exhausted",
-      "difficult",
-      "hard",
-      "worried",
-      "failing",
-      "lost",
-      "confused",
       "frustrated",
-      "burnout",
-      "dropout",
-      "quit",
-      "leave",
-      "hate",
-      "boring",
-      "useless",
-      "terrible",
-      "scared",
-      "pressure",
-      "burden",
-      "stuck",
-      "trapped",
-      "helpless",
-      "miserable"
-    ],
-    "academic_keywords": [
-      "academic",
-      "course",
-      "class",
-      "study",
-      "studies",
-      "assignment",
-      "exam",
-      "test",
-      "grade",
-      "performance",
-      "learning",
-      "lecture",
-      "professor",
-      "faculty",
-      "college",
-      "university",
-      "semester",
-      "subject"
+      "exhausted",
+      "tired",
+      "failing"
     ],
     "dropout_indicators": [
       "want to quit",
-      "thinking of leaving",
-      "dropping out",
+      "drop out",
+      "give up",
       "can't continue",
-      "giving up",
-      "no point",
-      "waste of time",
-      "wrong choice",
-      "hate college",
-      "want to stop",
-      "considering leaving",
-      "might drop",
-      "should quit"
+      "thinking of leaving",
+      "want to leave"
+    ],
+    "academic_keywords": [
+      "study",
+      "class",
+      "exam",
+      "grade",
+      "course",
+      "college",
+      "university",
+      "professor",
+      "assignment"
     ]
   },
   "thresholds": {
     "low": 0.33,
     "medium": 0.66,
-    "high": 1.0
-  },
-  "smote_info": {
-    "original_samples": 40,
-    "original_at_risk": 4,
-    "synthetic_samples_created": 32,
-    "total_after_smote": 72
+    "high": 0.85
   }
 }

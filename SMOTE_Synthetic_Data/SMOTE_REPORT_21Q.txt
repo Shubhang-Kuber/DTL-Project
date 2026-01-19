@@ -1,0 +1,50 @@
+SMOTE SYNTHETIC DATA REPORT (21 Questions)
+==========================================
+Generated: 2026-01-18 17:42:29
+
+ORIGINAL DATA:
+- Total students: 40
+- At-risk students: 4
+- Not at-risk students: 36
+- Class ratio: 36:4 (imbalanced)
+
+SMOTE PARAMETERS:
+- k_neighbors: 2
+- random_state: 42
+
+AFTER SMOTE:
+- Total training samples: 62
+- At-risk samples: 31
+- Synthetic samples created: 28
+
+MODEL PERFORMANCE:
+XGBoost:
+- Test Accuracy: 100.00%
+- CV Accuracy: 100.00% (+/- 0.00%)
+
+Random Forest:
+- Test Accuracy: 83.33%
+- CV Accuracy: 98.46% (+/- 3.08%)
+
+QUESTIONS USED (21 total):
+- q1: academic_confidence (Academic Consistency)
+- q2: faculty_help_seeking (Academic Consistency)
+- q3: teaching_quality (Academic Consistency)
+- q4: academic_support_availability (Academic Consistency)
+- q5: admin_support_satisfaction (Academic Consistency)
+- q6: counseling_frequency (Academic Consistency)
+- q7: stress_level (Emotional Well-being)
+- q8: social_isolation (Emotional Well-being)
+- q9: family_support (Emotional Well-being)
+- q10: workload_overwhelm (Emotional Well-being)
+- q11: health_issues (Emotional Well-being)
+- q12: course_interest (Engagement & Motivation)
+- q13: study_motivation (Engagement & Motivation)
+- q14: extracurricular_engagement (Engagement & Motivation)
+- q15: attendance_rate (Engagement & Motivation)
+- q16: dropout_consideration (Engagement & Motivation)
+- q17: financial_problems (External / Financial Pressure)
+- q18: scholarship_loan_dependency (External / Financial Pressure)
+- q19: external_commitments (External / Financial Pressure)
+- q20: study_hours (External / Financial Pressure)
+- q21: family_dependents (External / Financial Pressure)
