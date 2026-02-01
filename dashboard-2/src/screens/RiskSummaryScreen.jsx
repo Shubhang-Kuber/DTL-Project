@@ -66,13 +66,13 @@ export function RiskSummaryScreen({
         </p>
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-3 mb-3">
           <p className="text-sm text-gray-700 dark:text-gray-300">
-            <strong>📊 ML Risk Score:</strong> {(overallRiskScore * 100).toFixed(1)}% 
+            <strong>ML Risk Score:</strong> {(overallRiskScore * 100).toFixed(1)}% 
             {' '}
             <span className="text-gray-600 dark:text-gray-400">(Dropout risk probability)</span>
           </p>
           {mlPrediction?.prediction && (
             <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
-              <strong>🎯 Prediction:</strong> {mlPrediction.prediction}
+              <strong>Prediction:</strong> {mlPrediction.prediction}
             </p>
           )}
         </div>

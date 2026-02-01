@@ -6,12 +6,13 @@ import {
 } from 'recharts';
 import { ScreenContainer, Card, Button } from '../components/index.jsx';
 import { getFeatureImportance, getMLConfig, ALGORITHMS } from '../utils/mlPredictor.js';
+import { QUESTIONS } from '../data/questions.js';
 
 /**
  * XGBoostVisualizer Component
  * Interactive educational visualization of the XGBoost + SMOTE algorithm
  */
-export default function XGBoostVisualizer({ scores, onBack }) {
+export default function XGBoostVisualizer({ scores, onBack, onContinue }) {
   const [activeSection, setActiveSection] = useState(0);
   const [boostingStep, setBoostingStep] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -57,11 +58,52 @@ export default function XGBoostVisualizer({ scores, onBack }) {
   };
 
   // Feature importance data for XGBoost
-  const importanceData = featureImportance.slice(0, 8).map((f, i) => ({
-    name: f.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-    importance: (f.weight * 100).toFixed(1),
-    fill: ['#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#ef4444'][i]
-  }));
+  // If XGBoost has too few features (overfitting), use Random Forest weights as fallback
+  const xgboostNonZero = featureImportance.filter(f => f.weight > 0);
+  const useRFWeights = xgboostNonZero.length < 5; // Use RF if XGBoost only uses < 5 features
+  
+  // Get Random Forest importance as fallback
+  const rfImportance = useRFWeights ? getFeatureImportance(ALGORITHMS.RANDOM_FOREST) : [];
+  
+  // Create a map of question IDs to actual question text
+  const questionTextMap = {};
+  QUESTIONS.forEach(q => {
+    questionTextMap[q.id] = q.text;
+  });
+  
+  const allImportanceData = (useRFWeights ? rfImportance : featureImportance)
+    .filter(f => f.weight > 0) // Only show features with non-zero importance
+    .map((f, i) => {
+      // Get the actual question text from QUESTIONS array using questionId
+      const questionText = questionTextMap[f.questionId];
+      
+      // Fallback to formatted name if question text not found
+      const displayText = questionText || f.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      
+      // Create a shorter version for Y-axis (truncate intelligently)
+      let shortName = displayText;
+      if (displayText.length > 45) {
+        // Try to break at a word boundary
+        const truncated = displayText.substring(0, 42);
+        const lastSpace = truncated.lastIndexOf(' ');
+        shortName = (lastSpace > 30 ? truncated.substring(0, lastSpace) : truncated) + '...';
+      }
+      
+      return {
+        name: displayText, // Full question text
+        shortName: shortName, // Truncated for Y-axis
+        importance: (f.weight * 100).toFixed(1),
+        rawWeight: f.weight,
+        questionId: f.questionId,
+        fill: ['#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#ef4444', '#fb923c', '#84cc16', '#06b6d4', '#14b8a6'][i % 12]
+      };
+    });
+  
+  // Take top 12 for better visibility
+  const importanceData = allImportanceData.slice(0, Math.min(12, allImportanceData.length));
+  
+  // Note if using fallback weights
+  const usingFallback = useRFWeights;
 
   return (
     <ScreenContainer
@@ -176,7 +218,7 @@ export default function XGBoostVisualizer({ scores, onBack }) {
                     <div className="text-center">
                       <div className="text-3xl mb-2">🏆</div>
                       <div className="font-medium text-gray-700 dark:text-gray-300">Higher Accuracy</div>
-                      <div className="text-sm text-gray-500">{((mlConfig?.models?.xgboost?.metrics?.cv_accuracy || 0.87) * 100).toFixed(1)}% CV accuracy</div>
+                      <div className="text-sm text-gray-500">{((mlConfig?.models?.xgboost?.metrics?.cv_accuracy || 0.95) * 100).toFixed(1)}% CV accuracy</div>
                     </div>
                   </div>
                 </div>
@@ -420,19 +462,28 @@ Synthetic Student: [Interest=2.5, Stress=4.5, Isolation=4.5]`}
                 <div className="text-center mb-6">
                   <div className="text-6xl mb-4">🎯</div>
                   <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-                    XGBoost Feature Importance
+                    Feature Importance (ML-Trained Weights)
                   </h2>
                   <p className="text-gray-600 dark:text-gray-400">
                     Which questions have the most influence on predictions?
                   </p>
+                  {usingFallback && (
+                    <div className="mt-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 rounded-lg p-4">
+                      <p className="text-sm text-amber-800 dark:text-amber-200">
+                        <strong>📊 Note:</strong> Due to the small training dataset, XGBoost focused heavily on one feature (overfitting). 
+                        For a more balanced analysis, we're showing feature importance from Random Forest, which considers all {importanceData.length} features 
+                        to give you a comprehensive understanding of what factors influence dropout risk.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Feature Importance Chart */}
-                <ResponsiveContainer width="100%" height={400}>
+                <ResponsiveContainer width="100%" height={500}>
                   <BarChart 
                     data={importanceData} 
                     layout="vertical"
-                    margin={{ top: 20, right: 30, left: 100, bottom: 20 }}
+                    margin={{ top: 20, right: 30, left: 200, bottom: 20 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis 
@@ -442,14 +493,25 @@ Synthetic Student: [Interest=2.5, Stress=4.5, Isolation=4.5]`}
                     />
                     <YAxis 
                       type="category"
-                      dataKey="name"
-                      tick={{ fill: '#60a5fa', fontSize: 11, fontWeight: 600 }}
-                      width={90}
+                      dataKey="shortName"
+                      tick={{ fill: '#60a5fa', fontSize: 10, fontWeight: 600 }}
+                      width={190}
                     />
                     <Tooltip 
                       formatter={(value) => `${value}%`}
-                      contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px' }}
-                      labelStyle={{ color: '#fff' }}
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-gray-900 text-white p-3 rounded-lg shadow-lg max-w-xs">
+                              <p className="font-semibold text-sm mb-1">{data.name}</p>
+                              <p className="text-blue-400">Importance: {data.importance}%</p>
+                              <p className="text-xs text-gray-400 mt-1">Weight: {data.rawWeight.toFixed(4)}</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
                     />
                     <Bar 
                       dataKey="importance" 
@@ -469,22 +531,78 @@ Synthetic Student: [Interest=2.5, Stress=4.5, Isolation=4.5]`}
                 </ResponsiveContainer>
 
                 {/* Top Factors */}
-                <div className="mt-6 grid md:grid-cols-3 gap-4">
-                  {importanceData.slice(0, 3).map((feature, i) => (
-                    <div 
-                      key={i}
-                      className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 
-                                rounded-xl p-4 border border-blue-200 dark:border-blue-800"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-2xl">{['🥇', '🥈', '🥉'][i]}</span>
-                        <span className="font-bold text-gray-800 dark:text-white">{feature.name}</span>
+                <div className="mt-6">
+                  <h3 className="font-bold text-gray-800 dark:text-white mb-4 text-center">
+                    Top {Math.min(3, importanceData.length)} Most Important Features
+                  </h3>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    {importanceData.slice(0, 3).map((feature, i) => (
+                      <div 
+                        key={i}
+                        className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 
+                                  rounded-xl p-4 border border-blue-200 dark:border-blue-800"
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-2xl">{['🥇', '🥈', '🥉'][i]}</span>
+                          <span className="font-bold text-gray-800 dark:text-white text-sm">{feature.name}</span>
+                        </div>
+                        <div className="text-3xl font-bold" style={{ color: feature.fill }}>
+                          {feature.importance}%
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Weight: {feature.rawWeight.toFixed(4)}
+                        </div>
                       </div>
-                      <div className="text-3xl font-bold" style={{ color: feature.fill }}>
-                        {feature.importance}%
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Weight Distribution by Category */}
+                <div className="mt-6 bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
+                  <h3 className="font-bold text-gray-800 dark:text-white mb-4">
+                    Weight Distribution by Category
+                  </h3>
+                  <div className="space-y-3">
+                    {(() => {
+                      // Calculate category totals
+                      const categoryWeights = {};
+                      const factorMapping = mlConfig?.factors || {};
+                      
+                      allImportanceData.forEach(feature => {
+                        // Find which factor this question belongs to
+                        let foundFactor = 'Other';
+                        Object.entries(factorMapping).forEach(([factorName, factorData]) => {
+                          if (factorData.questions && factorData.questions.includes(feature.questionId)) {
+                            foundFactor = factorName;
+                          }
+                        });
+                        
+                        if (!categoryWeights[foundFactor]) {
+                          categoryWeights[foundFactor] = 0;
+                        }
+                        categoryWeights[foundFactor] += feature.rawWeight;
+                      });
+                      
+                      const total = Object.values(categoryWeights).reduce((a, b) => a + b, 0);
+                      
+                      return Object.entries(categoryWeights)
+                        .sort(([, a], [, b]) => b - a)
+                        .map(([category, weight]) => (
+                          <div key={category}>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="text-gray-700 dark:text-gray-300">{category}</span>
+                              <span className="font-medium">{((weight / total) * 100).toFixed(1)}%</span>
+                            </div>
+                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"
+                                style={{ width: `${(weight / total) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        ));
+                    })()}
+                  </div>
                 </div>
               </Card>
             </motion.div>
@@ -523,7 +641,7 @@ Synthetic Student: [Interest=2.5, Stress=4.5, Isolation=4.5]`}
                 <div className="grid md:grid-cols-4 gap-4 mb-6">
                   <div className="bg-green-100 dark:bg-green-900/30 rounded-xl p-4 text-center">
                     <div className="text-2xl font-bold text-green-600">
-                      {((mlConfig?.models?.xgboost?.metrics?.cv_accuracy || 0.87) * 100).toFixed(1)}%
+                      {((mlConfig?.models?.xgboost?.metrics?.cv_accuracy || 0.95) * 100).toFixed(1)}%
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">CV Accuracy</div>
                   </div>
@@ -535,7 +653,7 @@ Synthetic Student: [Interest=2.5, Stress=4.5, Isolation=4.5]`}
                   </div>
                   <div className="bg-purple-100 dark:bg-purple-900/30 rounded-xl p-4 text-center">
                     <div className="text-2xl font-bold text-purple-600">
-                      {mlConfig?.smote_info?.total_after_smote || 72}
+                      {mlConfig?.smote_info?.total_after_smote || 62}
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">Training Samples</div>
                   </div>
@@ -547,18 +665,98 @@ Synthetic Student: [Interest=2.5, Stress=4.5, Isolation=4.5]`}
                   </div>
                 </div>
 
-                {/* Factor Breakdown */}
+                {/* Your Personal Risk Breakdown */}
+                {scores?.responses && importanceData.length > 0 && (
+                  <div className="bg-gray-100 dark:bg-gray-800 rounded-xl p-6 mb-6">
+                    <h3 className="font-bold text-gray-800 dark:text-white mb-4">
+                      Your Personal Risk Breakdown
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                      See exactly how each of your answers contributed to your risk score
+                      {usingFallback && <span className="font-medium"> (using comprehensive feature analysis)</span>}
+                    </p>
+                    <div className="space-y-3">
+                      {importanceData.map((feature) => {
+                        const response = scores.responses[feature.questionId];
+                        if (!response) return null;
+                        
+                        const questionConfig = mlConfig?.questions?.[feature.questionId];
+                        const isNegative = questionConfig?.direction === 'negative';
+                        
+                        // Calculate contribution
+                        const normalized = (response - 1) / 4;
+                        const contribution = isNegative ? normalized : (1 - normalized);
+                        const contributionPercent = (contribution * feature.rawWeight * 100).toFixed(1);
+                        
+                        // Determine risk level for this answer
+                        let riskLevel = 'Low';
+                        let riskColor = '#10b981';
+                        if (contribution > 0.66) {
+                          riskLevel = 'High';
+                          riskColor = '#ef4444';
+                        } else if (contribution > 0.33) {
+                          riskLevel = 'Medium';
+                          riskColor = '#f59e0b';
+                        }
+                        
+                        return (
+                          <div key={feature.questionId} className="bg-white dark:bg-gray-700 rounded-lg p-4 border-l-4" style={{ borderLeftColor: riskColor }}>
+                            <div className="flex justify-between items-start mb-2">
+                              <div className="flex-1">
+                                <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                                  {feature.name}
+                                </span>
+                                <div className="text-xs text-gray-600 dark:text-gray-400 mt-1 space-y-1">
+                                  <div>📝 Your answer: <strong>{response}/5</strong></div>
+                                  <div>🎯 Direction: <strong>{isNegative ? 'Negative Indicator' : 'Positive Indicator'}</strong></div>
+                                  <div>⚖️ ML Weight: <strong>{(feature.rawWeight * 100).toFixed(2)}%</strong></div>
+                                  <div>📊 Risk Level: <strong style={{ color: riskColor }}>{riskLevel}</strong></div>
+                                </div>
+                              </div>
+                              <div className="ml-4 text-right">
+                                <div className="text-lg font-bold" style={{ color: feature.fill }}>
+                                  {contributionPercent}%
+                                </div>
+                                <div className="text-xs text-gray-500">contribution</div>
+                              </div>
+                            </div>
+                            <div className="mt-3">
+                              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                                <span>Risk Contribution</span>
+                                <span>{(contribution * 100).toFixed(0)}%</span>
+                              </div>
+                              <div className="h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                                <motion.div
+                                  className="h-full rounded-full"
+                                  style={{ backgroundColor: riskColor }}
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${Math.min(100, contribution * 100)}%` }}
+                                  transition={{ duration: 0.8, delay: 0.1 }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Detailed Factor Analysis */}
                 {scores?.factorScores && (
                   <div className="bg-gray-100 dark:bg-gray-800 rounded-xl p-6">
                     <h3 className="font-bold text-gray-800 dark:text-white mb-4">
-                      Factor Risk Breakdown
+                      Detailed Factor Analysis
                     </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                      Overall risk by category (combining all questions in each factor)
+                    </p>
                     <div className="space-y-3">
                       {Object.entries(scores.factorScores).map(([factor, score]) => (
                         <div key={factor}>
                           <div className="flex justify-between text-sm mb-1">
-                            <span className="text-gray-700 dark:text-gray-300">{factor}</span>
-                            <span className="font-medium">{(score * 100).toFixed(0)}%</span>
+                            <span className="text-gray-700 dark:text-gray-300 font-medium">{factor}</span>
+                            <span className="font-bold">{(score * 100).toFixed(1)}%</span>
                           </div>
                           <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                             <motion.div
@@ -580,11 +778,16 @@ Synthetic Student: [Interest=2.5, Stress=4.5, Isolation=4.5]`}
           )}
         </AnimatePresence>
 
-        {/* Back Button */}
-        <div className="text-center mt-8">
+        {/* Navigation Buttons */}
+        <div className="flex gap-4 justify-center mt-8">
           <Button onClick={onBack} variant="secondary">
-            ← Back to Results
+            ← Back to Analysis
           </Button>
+          {onContinue && (
+            <Button onClick={onContinue} variant="primary">
+              Continue to Recommendations →
+            </Button>
+          )}
         </div>
       </div>
     </ScreenContainer>

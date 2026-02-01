@@ -6,7 +6,7 @@ import { ScreenContainer, Card, Button } from '../components/index.jsx';
  * AlgorithmSelectionScreen
  * Allows users to choose between Random Forest and XGBoost algorithms
  */
-export default function AlgorithmSelectionScreen({ onSelectAlgorithm, mlConfig }) {
+export default function AlgorithmSelectionScreen({ onSelectAlgorithm, onViewValidation, mlConfig }) {
   const algorithms = [
     {
       id: 'random_forest',
@@ -18,7 +18,7 @@ export default function AlgorithmSelectionScreen({ onSelectAlgorithm, mlConfig }
         'Shows clear feature importance',
         'Good baseline accuracy'
       ],
-      accuracy: mlConfig?.models?.random_forest?.metrics?.cv_accuracy || 0.85,
+      accuracy: mlConfig?.models?.random_forest?.metrics?.accuracy || 0.833,
       color: 'from-green-500 to-emerald-600',
       bgColor: 'bg-green-50 dark:bg-green-900/20',
       borderColor: 'border-green-300 dark:border-green-700'
@@ -33,7 +33,7 @@ export default function AlgorithmSelectionScreen({ onSelectAlgorithm, mlConfig }
         'Learns from mistakes iteratively',
         'Enhanced with SMOTE balancing'
       ],
-      accuracy: mlConfig?.models?.xgboost?.metrics?.cv_accuracy || 0.87,
+      accuracy: mlConfig?.models?.xgboost?.metrics?.cv_accuracy || 0.95,
       color: 'from-blue-500 to-indigo-600',
       bgColor: 'bg-blue-50 dark:bg-blue-900/20',
       borderColor: 'border-blue-300 dark:border-blue-700',
@@ -47,6 +47,34 @@ export default function AlgorithmSelectionScreen({ onSelectAlgorithm, mlConfig }
       subtitle="Select which machine learning model you'd like to use for your risk assessment"
     >
       <div className="max-w-4xl mx-auto">
+        
+        {/* Model Validation Button - Prominent Placement */}
+        <Card className="mb-6 bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 border-2 border-orange-300 dark:border-orange-700">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="text-3xl">🎓</div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-1">
+                  How Do We Know It's Accurate?
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  View our comprehensive model validation methods, accuracy metrics, and statistical analysis
+                </p>
+              </div>
+            </div>
+            <motion.button
+              className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white 
+                       rounded-xl font-semibold shadow-lg hover:shadow-xl 
+                       transition-all duration-300 whitespace-nowrap"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onViewValidation}
+            >
+              📊 View Validation
+            </motion.button>
+          </div>
+        </Card>
+
         {/* Introduction */}
         <Card className="mb-8 text-center">
           <div className="text-5xl mb-4">🤖</div>

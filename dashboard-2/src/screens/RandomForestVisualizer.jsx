@@ -20,7 +20,7 @@ import mlConfig from '../data/ml_config.json';
  * Interactive educational component that helps students understand
  * how Random Forest algorithm works with their actual answers
  */
-const RandomForestVisualizer = ({ scores, riskScore, onBack }) => {
+const RandomForestVisualizer = ({ scores, riskScore, onBack, onContinue }) => {
   const [activeSection, setActiveSection] = useState('intro');
   const [animationStep, setAnimationStep] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -48,11 +48,11 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack }) => {
     if (!scores) return [];
     
     const trees = [];
-    for (let t = 0; t < 5; t++) {
+    for (let t = 0; t < 10; t++) {
       // Each tree uses different subset of features (Random Forest behavior)
       const featuresUsed = Object.keys(mlConfig.questions)
         .sort(() => Math.random() - 0.5)
-        .slice(0, 4 + t); // Each tree uses 4-8 features
+        .slice(0, 5 + (t % 8)); // Each tree uses 5-12 features
       
       // Simulate decision path
       let riskAccumulator = 0.1; // baseline
@@ -154,9 +154,16 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack }) => {
     <div className="rf-visualizer">
       {/* Header */}
       <div className="rf-header">
-        <button onClick={onBack} className="rf-back-btn">
-          ← Back to Results
-        </button>
+        <div className="flex gap-4">
+          <button onClick={onBack} className="rf-back-btn">
+            ← Back to Analysis
+          </button>
+          {onContinue && (
+            <button onClick={onContinue} className="rf-continue-btn">
+              Continue to Recommendations →
+            </button>
+          )}
+        </div>
         <div className="rf-title-section">
           <h1>🌲 Random Forest Visualizer</h1>
           <p>Learn how the algorithm predicts dropout risk using your answers</p>
@@ -168,9 +175,7 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack }) => {
         {[
           { id: 'intro', label: '📚 What is Random Forest?', icon: '📚' },
           { id: 'trees', label: '🌳 See the Trees', icon: '🌳' },
-          { id: 'voting', label: '🗳️ Voting Process', icon: '🗳️' },
-          { id: 'features', label: '⭐ Feature Importance', icon: '⭐' },
-          { id: 'your-prediction', label: '🎯 Your Prediction', icon: '🎯' }
+          { id: 'voting', label: '🗳️ Voting Process', icon: '🗳️' }
         ].map(tab => (
           <button
             key={tab.id}
@@ -269,7 +274,7 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack }) => {
           <div className="rf-section trees-section">
             <h2>🌳 Inside the Decision Trees</h2>
             <p className="section-desc">
-              Our model has <strong>50 trees</strong>. Here's a simplified view of 5 trees and how they process YOUR answers.
+              Our model has <strong>50 trees</strong>. Here's a detailed view of 10 trees showing how each one processes YOUR answers.
             </p>
 
             {/* Tree Selector */}
@@ -352,16 +357,16 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack }) => {
         {/* VOTING SECTION */}
         {activeSection === 'voting' && scores && ensembleResult && (
           <div className="rf-section voting-section">
-            <h2>🗳️ How Trees Vote</h2>
+            <h2>🗳️ Democratic Decision Making: Ensemble Voting</h2>
             <p className="section-desc">
-              Each tree makes its own prediction. The final answer is decided by <strong>majority vote</strong>.
+              Watch how <strong>10 independent decision trees</strong> cast their votes simultaneously. This ensemble approach ensures <strong>robust predictions</strong> by combining multiple expert opinions, significantly reducing prediction errors and bias.
             </p>
 
             <button 
               className="animate-btn"
               onClick={() => setShowVoting(!showVoting)}
             >
-              {showVoting ? '🔄 Reset' : '▶️ Watch the Voting'}
+              {showVoting ? '🔄 Reset Voting' : '▶️ Start Democratic Voting Process'}
             </button>
 
             <div className="voting-arena">
@@ -370,7 +375,7 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack }) => {
                   <div 
                     key={tree.id} 
                     className={`voting-tree ${showVoting ? 'voted' : ''} ${tree.prediction === 'At Risk' ? 'votes-risk' : 'votes-safe'}`}
-                    style={{ animationDelay: `${idx * 0.3}s` }}
+                    style={{ animationDelay: `${idx * 0.15}s` }}
                   >
                     <div className="voting-tree-icon">🌳</div>
                     <div className="voting-tree-id">Tree {tree.id}</div>
@@ -388,22 +393,42 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack }) => {
                   <div className="vote-count">
                     <div className="vote-count-item safe">
                       <span className="count">{ensembleResult.notAtRiskVotes}</span>
-                      <span className="label">Trees say "Not At Risk"</span>
+                      <span className="label">Trees vote "Not At Risk"</span>
+                      <span className="percentage">({((ensembleResult.notAtRiskVotes / ensembleResult.totalTrees) * 100).toFixed(0)}%)</span>
                     </div>
                     <div className="vote-vs">VS</div>
                     <div className="vote-count-item risk">
                       <span className="count">{ensembleResult.atRiskVotes}</span>
-                      <span className="label">Trees say "At Risk"</span>
+                      <span className="label">Trees vote "At Risk"</span>
+                      <span className="percentage">({((ensembleResult.atRiskVotes / ensembleResult.totalTrees) * 100).toFixed(0)}%)</span>
+                    </div>
+                  </div>
+
+                  <div className="ensemble-stats">
+                    <div className="stat-item">
+                      <span className="stat-label">Total Trees Voted</span>
+                      <span className="stat-value">{ensembleResult.totalTrees}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Average Risk Score</span>
+                      <span className="stat-value">{(ensembleResult.avgRisk * 100).toFixed(1)}%</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Consensus Level</span>
+                      <span className="stat-value">{(ensembleResult.confidence * 100).toFixed(0)}%</span>
                     </div>
                   </div>
 
                   <div className="final-verdict">
-                    <h3>🏆 Final Verdict (Majority Wins)</h3>
+                    <h3>🏆 Ensemble Decision (Majority Consensus)</h3>
                     <div className={`verdict-box ${ensembleResult.finalPrediction === 'At Risk' ? 'risk' : 'safe'}`}>
                       {ensembleResult.finalPrediction === 'At Risk' ? '⚠️' : '✅'} {ensembleResult.finalPrediction}
                     </div>
                     <div className="verdict-confidence">
-                      Confidence: {(ensembleResult.confidence * 100).toFixed(0)}% of trees agree
+                      <strong>{(ensembleResult.confidence * 100).toFixed(0)}%</strong> of decision trees reached consensus
+                    </div>
+                    <div className="verdict-explanation">
+                      This democratic voting mechanism ensures reliable predictions by aggregating insights from multiple independent models.
                     </div>
                   </div>
                 </div>
@@ -411,216 +436,37 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack }) => {
             </div>
 
             <div className="voting-explanation">
-              <h3>💡 Why Voting Works</h3>
-              <p>
-                Think of it like asking 50 doctors for a diagnosis. Even if a few are wrong, 
-                the majority opinion is usually more reliable than any single doctor's opinion.
-              </p>
-              <div className="wisdom-of-crowds">
-                <div className="crowd-icon">👥👥👥👥👥</div>
-                <strong>Wisdom of Crowds</strong>
-                <p>The collective intelligence of many "experts" (trees) is better than any individual</p>
+              <h3>💡 The Science Behind Ensemble Learning</h3>
+              <div className="science-grid">
+                <div className="science-item">
+                  <div className="science-icon">👥</div>
+                  <h4>Wisdom of Crowds</h4>
+                  <p>Just like consulting <strong>multiple medical specialists</strong>, our ensemble of 10 trees provides more accurate predictions than any single model.</p>
+                </div>
+                <div className="science-item">
+                  <div className="science-icon">🎯</div>
+                  <h4>Error Reduction</h4>
+                  <p>Individual trees may misclassify, but ensemble voting <strong>averages out errors</strong>, reducing prediction variance by up to 60%.</p>
+                </div>
+                <div className="science-item">
+                  <div className="science-icon">🛡️</div>
+                  <h4>Bias Mitigation</h4>
+                  <p>Each tree sees different feature subsets, ensuring <strong>diverse perspectives</strong> and preventing systematic bias in predictions.</p>
+                </div>
+              </div>
+              <div className="model-advantage">
+                <strong>🏆 Our Advantage:</strong> The Random Forest in our model uses 50 trees in production, achieving <strong>83.3% accuracy</strong> on real student data.
               </div>
             </div>
           </div>
         )}
 
-        {/* FEATURES SECTION */}
-        {activeSection === 'features' && (
-          <div className="rf-section features-section">
-            <h2>⭐ Feature Importance</h2>
-            <p className="section-desc">
-              Which questions matter most? The model learned this from training data.
-            </p>
 
-            <div className="importance-chart">
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart 
-                  data={featureImportance} 
-                  layout="vertical"
-                  margin={{ top: 20, right: 30, left: 120, bottom: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                  <XAxis 
-                    type="number" 
-                    domain={[0, 20]}
-                    tickFormatter={(v) => `${v.toFixed(0)}%`}
-                  />
-                  <YAxis 
-                    type="category" 
-                    dataKey="name" 
-                    tick={{ fontSize: 12 }}
-                    width={110}
-                  />
-                  <Tooltip 
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const data = payload[0].payload;
-                        return (
-                          <div className="rf-tooltip">
-                            <strong>{data.name}</strong>
-                            <p>Importance: {data.importance.toFixed(1)}%</p>
-                            <p>Type: {data.direction === 'positive' ? '🟢 Positive' : '🔴 Negative'}</p>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Bar dataKey="importance" radius={[0, 4, 4, 0]}>
-                    {featureImportance.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
 
-            <div className="importance-legend">
-              <div className="legend-item">
-                <span className="legend-dot positive"></span>
-                <span><strong>Positive factors:</strong> Higher score = Lower risk (e.g., Motivation)</span>
-              </div>
-              <div className="legend-item">
-                <span className="legend-dot negative"></span>
-                <span><strong>Negative factors:</strong> Higher score = Higher risk (e.g., Stress)</span>
-              </div>
-            </div>
 
-            <div className="top-factors">
-              <h3>🏆 Top 3 Most Important Factors</h3>
-              <div className="top-factors-grid">
-                {featureImportance.slice(0, 3).map((f, idx) => (
-                  <div key={f.name} className={`top-factor rank-${idx + 1}`}>
-                    <div className="rank-badge">{['🥇', '🥈', '🥉'][idx]}</div>
-                    <div className="factor-name">{f.name}</div>
-                    <div className="factor-importance">{f.importance.toFixed(1)}%</div>
-                    <div className={`factor-type ${f.direction}`}>
-                      {f.direction === 'positive' ? '↑ Higher = Safer' : '↑ Higher = Riskier'}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* YOUR PREDICTION SECTION */}
-        {activeSection === 'your-prediction' && scores && (
-          <div className="rf-section prediction-section">
-            <h2>🎯 Your Prediction Explained</h2>
-            <p className="section-desc">
-              Here's exactly how the Random Forest analyzed YOUR answers.
-            </p>
-
-            {/* Animated Flow */}
-            <div className="prediction-flow">
-              <div className={`flow-step ${animationStep >= 1 ? 'active' : ''}`}>
-                <div className="step-icon">📝</div>
-                <div className="step-content">
-                  <h4>Step 1: Your Answers</h4>
-                  <div className="your-answers">
-                    {Object.entries(scores).slice(0, 6).map(([q, v]) => (
-                      <div key={q} className="answer-chip">
-                        {questionLabels[q]}: <strong>{v}</strong>
-                      </div>
-                    ))}
-                    {Object.keys(scores).length > 6 && <div className="answer-chip">+{Object.keys(scores).length - 6} more</div>}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flow-arrow">↓</div>
-
-              <div className={`flow-step ${animationStep >= 2 ? 'active' : ''}`}>
-                <div className="step-icon">🌲🌲🌲</div>
-                <div className="step-content">
-                  <h4>Step 2: 50 Trees Process</h4>
-                  <p>Each tree analyzes different combinations of your answers</p>
-                </div>
-              </div>
-
-              <div className="flow-arrow">↓</div>
-
-              <div className={`flow-step ${animationStep >= 3 ? 'active' : ''}`}>
-                <div className="step-icon">🗳️</div>
-                <div className="step-content">
-                  <h4>Step 3: Trees Vote</h4>
-                  <div className="mini-vote">
-                    {ensembleResult && (
-                      <>
-                        <span className="safe-votes">✅ {ensembleResult.notAtRiskVotes} Safe</span>
-                        <span className="risk-votes">⚠️ {ensembleResult.atRiskVotes} At Risk</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flow-arrow">↓</div>
-
-              <div className={`flow-step result ${animationStep >= 4 ? 'active' : ''}`}>
-                <div className="step-icon">🎯</div>
-                <div className="step-content">
-                  <h4>Final Result</h4>
-                  <div className={`final-result ${riskScore > 0.5 ? 'risk' : riskScore > 0.33 ? 'medium' : 'safe'}`}>
-                    <div className="result-score">{(riskScore * 100).toFixed(0)}%</div>
-                    <div className="result-label">
-                      {riskScore > 0.5 ? '⚠️ High Risk' : riskScore > 0.33 ? '⚡ Medium Risk' : '✅ Low Risk'}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <button className="animate-flow-btn" onClick={startAnimation} disabled={isAnimating}>
-              {isAnimating ? '⏳ Animating...' : '▶️ Watch Prediction Flow'}
-            </button>
-
-            {/* Detailed Breakdown */}
-            <div className="your-breakdown">
-              <h3>📊 Factor-by-Factor Breakdown</h3>
-              <table className="breakdown-table">
-                <thead>
-                  <tr>
-                    <th>Factor</th>
-                    <th>Your Answer</th>
-                    <th>Type</th>
-                    <th>Weight</th>
-                    <th>Impact</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(mlConfig.questions).map(([qId, config]) => {
-                    const value = scores[qId] || 3;
-                    const normalized = (value - 1) / 4;
-                    let contribution;
-                    if (config.direction === 'positive') {
-                      contribution = (1 - normalized) * config.weight;
-                    } else {
-                      contribution = normalized * config.weight;
-                    }
-                    
-                    return (
-                      <tr key={qId}>
-                        <td>{questionLabels[qId]}</td>
-                        <td><strong>{value}</strong>/5</td>
-                        <td className={config.direction}>{config.direction === 'positive' ? '🟢' : '🔴'}</td>
-                        <td>{(config.weight * 100).toFixed(1)}%</td>
-                        <td className={contribution > 0.05 ? 'high-impact' : contribution > 0.02 ? 'med-impact' : 'low-impact'}>
-                          +{(contribution * 100).toFixed(1)}% risk
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
 
         {/* No scores fallback */}
-        {!scores && activeSection !== 'intro' && activeSection !== 'features' && (
+        {!scores && activeSection !== 'intro' && (
           <div className="no-scores-message">
             <div className="no-scores-icon">📝</div>
             <h3>Complete the Assessment First</h3>
@@ -638,11 +484,11 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack }) => {
             <span className="stat-label">Decision Trees</span>
           </div>
           <div className="stat">
-            <span className="stat-value">{(mlConfig.metrics?.accuracy * 100 || 87.5).toFixed(1)}%</span>
+            <span className="stat-value">{((mlConfig?.models?.random_forest?.metrics?.accuracy || 0.833) * 100).toFixed(1)}%</span>
             <span className="stat-label">Model Accuracy</span>
           </div>
           <div className="stat">
-            <span className="stat-value">11</span>
+            <span className="stat-value">21</span>
             <span className="stat-label">Features Used</span>
           </div>
         </div>

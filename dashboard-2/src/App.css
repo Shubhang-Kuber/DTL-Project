@@ -955,6 +955,24 @@ html {
   transform: translateX(-4px);
 }
 
+.rf-continue-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  white-space: nowrap;
+}
+
+.rf-continue-btn:hover {
+  transform: translateX(4px);
+}
+
 .rf-title-section h1 {
   font-size: 2rem;
   font-weight: 700;

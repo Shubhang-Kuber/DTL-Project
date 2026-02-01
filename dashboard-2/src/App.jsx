@@ -7,6 +7,7 @@ import MLVisualizationScreen from './screens/MLVisualizationScreen';
 import RandomForestVisualizer from './screens/RandomForestVisualizer';
 import AlgorithmSelectionScreen from './screens/AlgorithmSelectionScreen';
 import XGBoostVisualizer from './screens/XGBoostVisualizer';
+import ModelValidationScreen from './screens/ModelValidationScreen';
 // Legacy scoring (kept for backward compatibility)
 import {
   calculateFactorScores,
@@ -33,6 +34,7 @@ import './App.css';
  * 2. Risk Summary → display overall risk
  * 3. Factor Breakdown → detail each factor
  * 4. Recommendations → personalized suggestions
+ * 8. Model Validation (Optional) → explain how accuracy is measured
  * 
  * NOW USES DUAL ML-BASED PREDICTION: Random Forest OR XGBoost (with SMOTE)
  */
@@ -50,6 +52,7 @@ function App() {
             setSelectedAlgorithm(algorithm);
             setCurrentScreen(1);
           }}
+          onViewValidation={() => setCurrentScreen(8)}
           mlConfig={mlConfig}
         />
       ),
@@ -165,6 +168,7 @@ function App() {
           scores={analysisData?.responses || null}
           riskScore={analysisData?.overallScore || 0}
           onBack={() => setCurrentScreen(3)}
+          onContinue={() => setCurrentScreen(4)}
         />
       ),
     },
@@ -174,6 +178,16 @@ function App() {
         <XGBoostVisualizer
           scores={analysisData}
           onBack={() => setCurrentScreen(3)}
+          onContinue={() => setCurrentScreen(4)}
+        />
+      ),
+    },
+    {
+      name: 'Model Validation',
+      component: (
+        <ModelValidationScreen
+          onContinue={() => setCurrentScreen(0)}
+          mlConfig={mlConfig}
         />
       ),
     },

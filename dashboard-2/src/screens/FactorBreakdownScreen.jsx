@@ -288,7 +288,7 @@ export function FactorBreakdownScreen({ factorScores, onContinue, onBack, onView
           How Risk is Calculated
         </h3>
         <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
-          Your overall risk score is a <strong>weighted average</strong> of these five factors:
+          Your overall risk score is a <strong>weighted average</strong> of these four factors:
         </p>
         <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
           {Object.entries(FACTORS).map(([factorName, factorDef]) => (
@@ -343,7 +343,7 @@ export function FactorBreakdownScreen({ factorScores, onContinue, onBack, onView
             <div className="text-5xl">🚀</div>
             <div className="flex-1 min-w-[200px]">
               <h3 className="text-lg font-bold text-blue-800 dark:text-blue-200 mb-1">
-                Learn How XGBoost + SMOTE Works!
+                Learn How XGBoost Works!
                 <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
                   YOUR SELECTED ALGORITHM
                 </span>
