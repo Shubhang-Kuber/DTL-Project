@@ -42,14 +42,6 @@ export function RiskSummaryScreen({
           color={riskClassification.color}
           badge={riskClassification.badge}
         />
-        {/* ML Model Indicator */}
-        {isMLPrediction && (
-          <div className="mt-3 flex justify-center">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200">
-              🤖 ML Model Prediction • {(confidence * 100).toFixed(0)}% confidence
-            </span>
-          </div>
-        )}
       </div>
 
       {/* Explanation */}
