@@ -63,6 +63,9 @@ function App() {
         <AssessmentScreen
           onComplete={(data) => {
             // ===== ML-BASED PREDICTION WITH SELECTED ALGORITHM =====
+            console.log('Received data in App.jsx:', data);
+            console.log('Sentiment value:', data.sentiment);
+            
             // Use the selected ML model for prediction
             const mlPrediction = predictDropoutRisk(data.responses, data.sentiment || '', selectedAlgorithm);
             
@@ -116,6 +119,7 @@ function App() {
           factorScores={analysisData?.factorScores || {}}
           sentimentScore={analysisData?.sentimentScore || 0}
           sentimentAnalysis={analysisData?.sentimentAnalysis || null}
+          sentimentText={analysisData?.sentiment || ''}
           mlPrediction={analysisData?.mlPrediction || null}
           algorithmUsed={analysisData?.algorithmName || selectedAlgorithm}
           onContinue={() => setCurrentScreen(3)}

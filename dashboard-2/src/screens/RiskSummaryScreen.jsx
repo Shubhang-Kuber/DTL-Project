@@ -13,6 +13,7 @@ export function RiskSummaryScreen({
   factorScores, 
   sentimentScore, 
   sentimentAnalysis,
+  sentimentText,
   mlPrediction,
   onContinue, 
   onBack 
@@ -78,6 +79,12 @@ export function RiskSummaryScreen({
                 ({sentimentScore > 0 ? '+' : ''}{sentimentScore.toFixed(2)})
               </span>
             </p>
+            {sentimentText && (
+              <div className="mt-2 p-2 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Your written response:</p>
+                <p className="text-sm text-gray-700 dark:text-gray-300 italic">"{sentimentText}"</p>
+              </div>
+            )}
             {hasDropoutSignals && (
               <p className="text-xs text-red-600 dark:text-red-400 mt-1 font-medium">
                 ⚠️ Dropout-related keywords detected in your response

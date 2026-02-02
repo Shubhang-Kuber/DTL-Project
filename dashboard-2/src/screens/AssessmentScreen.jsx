@@ -53,6 +53,8 @@ export function AssessmentScreen({ onComplete }) {
 
   const handleAnalyze = () => {
     if (allQuestionsAnswered) {
+      console.log('Sending sentiment to parent:', sentiment);
+      console.log('Full data object:', { responses, sentiment });
       onComplete({ responses, sentiment });
     }
   };
