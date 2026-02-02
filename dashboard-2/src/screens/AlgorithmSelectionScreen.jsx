@@ -33,7 +33,7 @@ export default function AlgorithmSelectionScreen({ onSelectAlgorithm, onViewVali
         'Learns from mistakes iteratively',
         'Enhanced with SMOTE balancing'
       ],
-      accuracy: mlConfig?.models?.xgboost?.metrics?.cv_accuracy || 0.95,
+      accuracy: mlConfig?.models?.xgboost?.metrics?.accuracy || 0.9125,
       color: 'from-blue-500 to-indigo-600',
       bgColor: 'bg-blue-50 dark:bg-blue-900/20',
       borderColor: 'border-blue-300 dark:border-blue-700',
