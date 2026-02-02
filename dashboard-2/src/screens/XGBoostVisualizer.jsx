@@ -479,12 +479,13 @@ Synthetic Student: [Interest=2.5, Stress=4.5, Isolation=4.5]`}
                 </div>
 
                 {/* Feature Importance Chart */}
-                <ResponsiveContainer width="100%" height={500}>
-                  <BarChart 
-                    data={importanceData} 
-                    layout="vertical"
-                    margin={{ top: 20, right: 30, left: 200, bottom: 20 }}
-                  >
+                <div className="flex justify-center">
+                  <ResponsiveContainer width="95%" height={500}>
+                    <BarChart 
+                      data={importanceData} 
+                      layout="vertical"
+                      margin={{ top: 20, right: 40, left: 120, bottom: 20 }}
+                    >
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis 
                       type="number"
@@ -528,7 +529,8 @@ Synthetic Student: [Interest=2.5, Stress=4.5, Isolation=4.5]`}
                       ))}
                     </Bar>
                   </BarChart>
-                </ResponsiveContainer>
+                  </ResponsiveContainer>
+                </div>
 
                 {/* Top Factors */}
                 <div className="mt-6">
