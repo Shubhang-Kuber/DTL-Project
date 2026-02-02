@@ -662,33 +662,6 @@ export function RecommendationsScreen({ recommendations, analysisData, onBack, o
         </div>
       </Card>
 
-      {/* ML Model Visualization Section */}
-      {onViewMLModel && (
-        <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-2 border-indigo-200 dark:border-indigo-700 mb-8">
-          <div className="flex items-start gap-4">
-            <div className="text-4xl">🧠</div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-indigo-900 dark:text-indigo-200 mb-2">
-                Understand How We Predicted Your Risk
-              </h3>
-              <p className="text-sm text-indigo-800 dark:text-indigo-300 mb-4">
-                Curious about the ML model behind this assessment? Explore interactive visualizations 
-                that show how each factor contributes to the prediction, understand the weights, 
-                and see your personal breakdown.
-              </p>
-              <Button 
-                variant="primary" 
-                size="md" 
-                onClick={onViewMLModel}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-              >
-                🔍 View ML Model Visualization
-              </Button>
-            </div>
-          </div>
-        </Card>
-      )}
-
       {/* Navigation */}
       <div className="flex gap-4 mb-8">
         <Button onClick={onBack} variant="secondary" size="md">
