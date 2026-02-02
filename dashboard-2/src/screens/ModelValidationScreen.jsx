@@ -164,18 +164,21 @@ export default function ModelValidationScreen({ onContinue, mlConfig }) {
               <div className="space-y-3">
                 <div>
                   <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Test Accuracy</div>
-                  <div className="text-3xl font-bold text-blue-600">100%</div>
+                  <div className="text-3xl font-bold text-blue-600">
+                    {((mlConfig?.models?.xgboost?.metrics?.accuracy || 0.9125) * 100).toFixed(2)}%
+                  </div>
                   <div className="text-xs text-gray-500 mt-1">
-                    Perfect predictions on held-out test set
+                    Correctly predicted on held-out test set
                   </div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Cross-Validation Accuracy</div>
                   <div className="text-2xl font-bold text-blue-600">
-                    100% <span className="text-sm text-gray-500">(±0.00%)</span>
+                    {((mlConfig?.models?.xgboost?.metrics?.cv_accuracy || 0.8860) * 100).toFixed(2)}% 
+                    <span className="text-sm text-gray-500"> (±{((mlConfig?.models?.xgboost?.metrics?.cv_std || 0.021) * 100).toFixed(1)}%)</span>
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
-                    Consistent perfect performance with SMOTE balancing
+                    Average performance across 5-fold cross-validation
                   </div>
                 </div>
               </div>

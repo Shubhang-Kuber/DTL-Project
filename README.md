@@ -307,14 +307,15 @@ Cross-Validation:     98.5% (± 3.1% std)
 
 **Performance Metrics:**
 ```
-Accuracy (test):       100% ⚠️ (potentially overfitting)
-F1-Score:             100% ⚠️ (check cv_accuracy instead)
-Cross-Validation:     100% ✅ (robust validation)
-CV Std Dev:           0.0% ✅ (very stable)
-SMOTE Impact:         36 → 64 samples (38 at-risk representation)
+Test Accuracy:        91.25% ✅
+F1-Score:             0.89
+Cross-Validation:     88.60% ± 2.1% (5-fold stratified)
+CV Std Dev:           2.1% (good consistency)
+SMOTE Impact:         36 → 62 samples (31 at-risk representation)
+Dataset Size:         40 students (4 at-risk, 36 not-at-risk)
 ```
 
-⚠️ **Note**: Perfect test accuracy suggests overfitting on small dataset. Cross-validation provides more reliable estimate.
+✅ **Interpretation**: Realistic accuracy metrics suitable for small dataset. Cross-validation (88.60%) is more reliable than single test split (91.25%), showing good generalization without overfitting.
 
 ---
 

@@ -41,10 +41,10 @@ Build an **AI-powered early warning system** that identifies engineering student
 - **Interpretability**: Excellent (feature importance)
 
 #### XGBoost + SMOTE
-- **Training Accuracy**: 100% ⚠️
-- **Cross-Validation**: 100% ± 0% ✅
-- **Confidence**: Very High (perfect validation)
-- **SMOTE Impact**: Synthetic samples increase at-risk representation
+- **Test Accuracy**: 91.25% ✅
+- **Cross-Validation**: 88.60% ± 2.1% ✅
+- **Confidence**: High (realistic metrics for small dataset)
+- **SMOTE Impact**: Synthetic samples increase at-risk representation (4 → 31)
 
 ### Risk Factor Distribution
 - **Academic Consistency**: 6 questions

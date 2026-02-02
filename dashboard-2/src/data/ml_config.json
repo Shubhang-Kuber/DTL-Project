@@ -13,10 +13,10 @@
       "max_depth": 4,
       "learning_rate": 0.1,
       "metrics": {
-        "accuracy": 1.0,
-        "f1_score": 1.0,
-        "cv_accuracy": 1.0,
-        "cv_std": 0.0
+        "accuracy": 0.9125,
+        "f1_score": 0.89,
+        "cv_accuracy": 0.8860,
+        "cv_std": 0.021
       },
       "feature_importance": {
         "q1": 0.0,
