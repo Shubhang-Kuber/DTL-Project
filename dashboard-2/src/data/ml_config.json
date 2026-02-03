@@ -81,8 +81,8 @@
   "smote_info": {
     "original_samples": 40,
     "original_at_risk": 4,
-    "synthetic_samples_created": 28,
-    "total_after_smote": 62,
+    "synthetic_samples_created": 32,
+    "total_after_smote": 64,
     "k_neighbors_used": 2
   },
   "questions": {
