@@ -26,6 +26,7 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack, onContinue }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [selectedTree, setSelectedTree] = useState(0);
   const [showVoting, setShowVoting] = useState(false);
+  const [votingScenario, setVotingScenario] = useState('actual'); // 'actual', 'low-risk', 'medium-risk', 'high-risk'
 
   // Questions mapping
   const questionLabels = {
@@ -104,22 +105,65 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack, onContinue }) => {
   }, [scores]);
 
   // Calculate ensemble voting
-  const ensembleResult = useMemo(() => {
-    if (simulatedTrees.length === 0) return null;
+  const votingTreesData = useMemo(() => {
+    if (votingScenario === 'actual') {
+      return simulatedTrees;
+    }
     
-    const atRiskVotes = simulatedTrees.filter(t => t.prediction === 'At Risk').length;
-    const notAtRiskVotes = simulatedTrees.length - atRiskVotes;
-    const avgRisk = simulatedTrees.reduce((sum, t) => sum + t.finalRisk, 0) / simulatedTrees.length;
+    // Create modified trees based on voting scenario
+    return simulatedTrees.map((tree, idx) => {
+      let modifiedTree = { ...tree };
+      
+      if (votingScenario === 'low-risk') {
+        // Most trees vote "Not At Risk" - 8 safe, 2 at-risk
+        if (idx < 8) {
+          modifiedTree.prediction = 'Not At Risk';
+          modifiedTree.finalRisk = 0.2 + Math.random() * 0.2;
+        } else {
+          modifiedTree.prediction = 'At Risk';
+          modifiedTree.finalRisk = 0.6 + Math.random() * 0.3;
+        }
+      } else if (votingScenario === 'medium-risk') {
+        // Split voting - 5 safe, 5 at-risk
+        if (idx < 5) {
+          modifiedTree.prediction = 'Not At Risk';
+          modifiedTree.finalRisk = 0.2 + Math.random() * 0.2;
+        } else {
+          modifiedTree.prediction = 'At Risk';
+          modifiedTree.finalRisk = 0.6 + Math.random() * 0.3;
+        }
+      } else if (votingScenario === 'high-risk') {
+        // Most trees vote "At Risk" - 2 safe, 8 at-risk
+        if (idx < 2) {
+          modifiedTree.prediction = 'Not At Risk';
+          modifiedTree.finalRisk = 0.2 + Math.random() * 0.2;
+        } else {
+          modifiedTree.prediction = 'At Risk';
+          modifiedTree.finalRisk = 0.6 + Math.random() * 0.3;
+        }
+      }
+      
+      return modifiedTree;
+    });
+  }, [simulatedTrees, votingScenario]);
+
+  // Calculate ensemble voting with scenario-based trees
+  const ensembleResult = useMemo(() => {
+    if (votingTreesData.length === 0) return null;
+    
+    const atRiskVotes = votingTreesData.filter(t => t.prediction === 'At Risk').length;
+    const notAtRiskVotes = votingTreesData.length - atRiskVotes;
+    const avgRisk = votingTreesData.reduce((sum, t) => sum + t.finalRisk, 0) / votingTreesData.length;
     
     return {
       atRiskVotes,
       notAtRiskVotes,
-      totalTrees: simulatedTrees.length,
+      totalTrees: votingTreesData.length,
       avgRisk,
       finalPrediction: atRiskVotes > notAtRiskVotes ? 'At Risk' : 'Not At Risk',
-      confidence: Math.max(atRiskVotes, notAtRiskVotes) / simulatedTrees.length
+      confidence: Math.max(atRiskVotes, notAtRiskVotes) / votingTreesData.length
     };
-  }, [simulatedTrees]);
+  }, [votingTreesData]);
 
   // Feature importance data
   const featureImportance = useMemo(() => {
@@ -362,16 +406,83 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack, onContinue }) => {
               Watch how <strong>10 independent decision trees</strong> cast their votes simultaneously. This ensemble approach ensures <strong>robust predictions</strong> by combining multiple expert opinions, significantly reducing prediction errors and bias.
             </p>
 
+            {/* Voting Scenario Buttons */}
+            <div style={{ marginBottom: '20px', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button 
+                className={`scenario-btn ${votingScenario === 'low-risk' ? 'active' : ''}`}
+                onClick={() => {
+                  setVotingScenario('low-risk');
+                  setShowVoting(true);
+                }}
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  border: votingScenario === 'low-risk' ? '2px solid #10b981' : '2px solid #d1d5db',
+                  backgroundColor: votingScenario === 'low-risk' ? '#ecfdf5' : '#f9fafb',
+                  color: votingScenario === 'low-risk' ? '#065f46' : '#6b7280',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                ✅ Low-Risk Voting (8/10 Safe)
+              </button>
+              <button 
+                className={`scenario-btn ${votingScenario === 'medium-risk' ? 'active' : ''}`}
+                onClick={() => {
+                  setVotingScenario('medium-risk');
+                  setShowVoting(true);
+                }}
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  border: votingScenario === 'medium-risk' ? '2px solid #f59e0b' : '2px solid #d1d5db',
+                  backgroundColor: votingScenario === 'medium-risk' ? '#fffbeb' : '#f9fafb',
+                  color: votingScenario === 'medium-risk' ? '#92400e' : '#6b7280',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                ⚠️ Medium-Risk Voting (5/5 Split)
+              </button>
+              <button 
+                className={`scenario-btn ${votingScenario === 'high-risk' ? 'active' : ''}`}
+                onClick={() => {
+                  setVotingScenario('high-risk');
+                  setShowVoting(true);
+                }}
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  border: votingScenario === 'high-risk' ? '2px solid #ef4444' : '2px solid #d1d5db',
+                  backgroundColor: votingScenario === 'high-risk' ? '#fef2f2' : '#f9fafb',
+                  color: votingScenario === 'high-risk' ? '#7f1d1d' : '#6b7280',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                ⛔ High-Risk Voting (8/10 At-Risk)
+              </button>
+            </div>
+
             <button 
               className="animate-btn"
-              onClick={() => setShowVoting(!showVoting)}
+              onClick={() => {
+                setShowVoting(!showVoting);
+                setVotingScenario('actual');
+              }}
             >
-              {showVoting ? '🔄 Reset Voting' : '▶️ Start Democratic Voting Process'}
+              {showVoting ? '🔄 Reset Voting' : '▶️ Start Actual Voting Process'}
             </button>
 
             <div className="voting-arena">
               <div className="trees-voting">
-                {simulatedTrees.map((tree, idx) => (
+                {votingTreesData.map((tree, idx) => (
                   <div 
                     key={tree.id} 
                     className={`voting-tree ${showVoting ? 'voted' : ''} ${tree.prediction === 'At Risk' ? 'votes-risk' : 'votes-safe'}`}
