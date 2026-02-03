@@ -206,7 +206,7 @@ export default function ModelValidationScreen({ onContinue, mlConfig }) {
                 <div className="text-sm text-gray-600 dark:text-gray-400">Synthetic SMOTE Samples</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-green-500">64</div>
+                <div className="text-3xl font-bold text-green-500">72</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Total Training Samples</div>
               </div>
             </div>
