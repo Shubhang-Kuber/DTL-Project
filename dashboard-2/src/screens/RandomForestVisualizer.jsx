@@ -110,37 +110,25 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack, onContinue }) => {
       return simulatedTrees;
     }
     
-    // Create modified trees based on voting scenario
+    // Create modified trees based on voting scenario with proper risk ranges
     return simulatedTrees.map((tree, idx) => {
       let modifiedTree = { ...tree };
       
       if (votingScenario === 'low-risk') {
-        // Most trees vote "Not At Risk" - 8 safe, 2 at-risk
-        if (idx < 8) {
-          modifiedTree.prediction = 'Not At Risk';
-          modifiedTree.finalRisk = 0.2 + Math.random() * 0.2;
-        } else {
-          modifiedTree.prediction = 'At Risk';
-          modifiedTree.finalRisk = 0.6 + Math.random() * 0.3;
-        }
+        // Low-risk voting: Average risk score 0% - 33%
+        // All trees should have risk between 0 and 0.33
+        modifiedTree.prediction = 'Not At Risk';
+        modifiedTree.finalRisk = Math.random() * 0.33; // 0 to 0.33
       } else if (votingScenario === 'medium-risk') {
-        // Split voting - 5 safe, 5 at-risk
-        if (idx < 5) {
-          modifiedTree.prediction = 'Not At Risk';
-          modifiedTree.finalRisk = 0.2 + Math.random() * 0.2;
-        } else {
-          modifiedTree.prediction = 'At Risk';
-          modifiedTree.finalRisk = 0.6 + Math.random() * 0.3;
-        }
+        // Medium-risk voting: Average risk score 33% - 66%
+        // All trees should have risk between 0.33 and 0.66
+        modifiedTree.prediction = idx < 5 ? 'Not At Risk' : 'At Risk';
+        modifiedTree.finalRisk = 0.33 + Math.random() * 0.33; // 0.33 to 0.66
       } else if (votingScenario === 'high-risk') {
-        // Most trees vote "At Risk" - 2 safe, 8 at-risk
-        if (idx < 2) {
-          modifiedTree.prediction = 'Not At Risk';
-          modifiedTree.finalRisk = 0.2 + Math.random() * 0.2;
-        } else {
-          modifiedTree.prediction = 'At Risk';
-          modifiedTree.finalRisk = 0.6 + Math.random() * 0.3;
-        }
+        // High-risk voting: Average risk score 66% - 100%
+        // All trees should have risk between 0.66 and 1.0
+        modifiedTree.prediction = 'At Risk';
+        modifiedTree.finalRisk = 0.66 + Math.random() * 0.34; // 0.66 to 1.0
       }
       
       return modifiedTree;
