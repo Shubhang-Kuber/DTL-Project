@@ -1594,6 +1594,11 @@ html {
   color: white;
 }
 
+.verdict-box.medium {
+  background: #f59e0b;
+  color: white;
+}
+
 .verdict-box.risk {
   background: #ef4444;
   color: white;

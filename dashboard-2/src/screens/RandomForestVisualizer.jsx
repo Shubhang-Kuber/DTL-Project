@@ -155,12 +155,22 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack, onContinue }) => {
     const notAtRiskVotes = votingTreesData.length - atRiskVotes;
     const avgRisk = votingTreesData.reduce((sum, t) => sum + t.finalRisk, 0) / votingTreesData.length;
     
+    // Determine prediction based on average risk score ranges
+    let finalPrediction;
+    if (avgRisk < 0.33) {
+      finalPrediction = 'Not At Risk';
+    } else if (avgRisk >= 0.33 && avgRisk <= 0.66) {
+      finalPrediction = 'Medium Risk';
+    } else {
+      finalPrediction = 'At Risk';
+    }
+    
     return {
       atRiskVotes,
       notAtRiskVotes,
       totalTrees: votingTreesData.length,
       avgRisk,
-      finalPrediction: atRiskVotes > notAtRiskVotes ? 'At Risk' : 'Not At Risk',
+      finalPrediction,
       confidence: Math.max(atRiskVotes, notAtRiskVotes) / votingTreesData.length
     };
   }, [votingTreesData]);
@@ -531,15 +541,21 @@ const RandomForestVisualizer = ({ scores, riskScore, onBack, onContinue }) => {
                   </div>
 
                   <div className="final-verdict">
-                    <h3>🏆 Ensemble Decision (Majority Consensus)</h3>
-                    <div className={`verdict-box ${ensembleResult.finalPrediction === 'At Risk' ? 'risk' : 'safe'}`}>
-                      {ensembleResult.finalPrediction === 'At Risk' ? '⚠️' : '✅'} {ensembleResult.finalPrediction}
+                    <h3>🏆 Ensemble Decision (Based on Average Risk Score)</h3>
+                    <div className={`verdict-box ${
+                      ensembleResult.finalPrediction === 'At Risk' ? 'risk' : 
+                      ensembleResult.finalPrediction === 'Medium Risk' ? 'medium' : 
+                      'safe'
+                    }`}>
+                      {ensembleResult.finalPrediction === 'At Risk' ? '⚠️' : 
+                       ensembleResult.finalPrediction === 'Medium Risk' ? '⚡' : 
+                       '✅'} {ensembleResult.finalPrediction}
                     </div>
                     <div className="verdict-confidence">
-                      <strong>{(ensembleResult.confidence * 100).toFixed(0)}%</strong> of decision trees reached consensus
+                      <strong>Average Risk Score:</strong> {(ensembleResult.avgRisk * 100).toFixed(1)}%
                     </div>
                     <div className="verdict-explanation">
-                      This democratic voting mechanism ensures reliable predictions by aggregating insights from multiple independent models.
+                      This democratic voting mechanism ensures reliable predictions by aggregating insights from multiple independent models. Classification is based on average risk score: <strong>&lt; 33%</strong> = Not At Risk, <strong>33-66%</strong> = Medium Risk, <strong>&gt; 66%</strong> = At Risk.
                     </div>
                   </div>
                 </div>
